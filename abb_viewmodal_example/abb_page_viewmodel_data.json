@@ -1,0 +1,2821 @@
+{
+    "ProductViewModel": {
+        "Translations": [
+            {
+                "component": "common",
+                "key": "BackToSearch",
+                "value": "Back to search"
+            },
+            {
+                "component": "common",
+                "key": "Cancel",
+                "value": "Cancel"
+            },
+            {
+                "component": "common",
+                "key": "Categories",
+                "value": "Categories"
+            },
+            {
+                "component": "common",
+                "key": "ClearFilters",
+                "value": "Clear all"
+            },
+            {
+                "component": "common",
+                "key": "Confirm",
+                "value": "Confirm"
+            },
+            {
+                "component": "common",
+                "key": "DateCreated",
+                "value": "Created"
+            },
+            {
+                "component": "common",
+                "key": "DeselectAll",
+                "value": "Deselect All"
+            },
+            {
+                "component": "common",
+                "key": "Download",
+                "value": "Download"
+            },
+            {
+                "component": "common",
+                "key": "Filters",
+                "value": "Filters"
+            },
+            {
+                "component": "common",
+                "key": "Internal",
+                "value": "Not for External Public Distribution"
+            },
+            {
+                "component": "common",
+                "key": "ItemsSelected",
+                "value": "selected"
+            },
+            {
+                "component": "common",
+                "key": "NarrowByProduct",
+                "value": "Narrow By Product"
+            },
+            {
+                "component": "common",
+                "key": "PaginationOf",
+                "value": "of"
+            },
+            {
+                "component": "common",
+                "key": "PaginationShowing",
+                "value": "Showing"
+            },
+            {
+                "component": "common",
+                "key": "Preview",
+                "value": "Preview this product"
+            },
+            {
+                "component": "common",
+                "key": "PreviewNotAvailable",
+                "value": "Preview not available"
+            },
+            {
+                "component": "common",
+                "key": "PreviousProduct",
+                "value": "Previous Product"
+            },
+            {
+                "component": "common",
+                "key": "PrmFilters",
+                "value": "Filters"
+            },
+            {
+                "component": "common",
+                "key": "ProductListInformation",
+                "value": "Information"
+            },
+            {
+                "component": "common",
+                "key": "ProductListProduct",
+                "value": "Product"
+            },
+            {
+                "component": "common",
+                "key": "ProductListQuantity",
+                "value": "Quantity"
+            },
+            {
+                "component": "common",
+                "key": "ProductListSparePart",
+                "value": "Order Code"
+            },
+            {
+                "component": "common",
+                "key": "ProductNotFound",
+                "value": "No valid product found in search results"
+            },
+            {
+                "component": "common",
+                "key": "Products",
+                "value": "Products"
+            },
+            {
+                "component": "common",
+                "key": "Save",
+                "value": "Save"
+            },
+            {
+                "component": "common",
+                "key": "SelectAll",
+                "value": "Select All"
+            },
+            {
+                "component": "common",
+                "key": "ShowNResults",
+                "value": "Show {0} results"
+            },
+            {
+                "component": "common",
+                "key": "ShowResults",
+                "value": "Show results"
+            },
+            {
+                "component": "common",
+                "key": "SparePartsType",
+                "value": "Spare Parts Type"
+            },
+            {
+                "component": "products",
+                "key": "AddProductTo",
+                "value": "Choose catalog"
+            },
+            {
+                "component": "products",
+                "key": "AdditionalFilters",
+                "value": "Additional filters"
+            },
+            {
+                "component": "products",
+                "key": "AllFiltersModalTitle",
+                "value": "All filters"
+            },
+            {
+                "component": "products",
+                "key": "AllVariantProducts",
+                "value": "All Product Variants"
+            },
+            {
+                "component": "products",
+                "key": "AppliedFilters",
+                "value": "Applied filters"
+            },
+            {
+                "component": "products",
+                "key": "ApplyFilters",
+                "value": "Apply filters"
+            },
+            {
+                "component": "products",
+                "key": "ApproveFilterValuesSelected",
+                "value": "Ready"
+            },
+            {
+                "component": "products",
+                "key": "AvailableFilters",
+                "value": "Available filters"
+            },
+            {
+                "component": "products",
+                "key": "BackToTop",
+                "value": "Back to top"
+            },
+            {
+                "component": "products",
+                "key": "CannotFindCatalog",
+                "value": "Cannot find catalog"
+            },
+            {
+                "component": "products",
+                "key": "CarouselAriaGallery",
+                "value": "Gallery"
+            },
+            {
+                "component": "products",
+                "key": "CarouselAriaNavigateToSlide",
+                "value": "Navigate to item {slideNumber}"
+            },
+            {
+                "component": "products",
+                "key": "CarouselAriaNextSlide",
+                "value": "Navigate to next item"
+            },
+            {
+                "component": "products",
+                "key": "CarouselAriaPreviousSlide",
+                "value": "Navigate to previous item"
+            },
+            {
+                "component": "products",
+                "key": "CarouselIconArrowDown",
+                "value": "Arrow pointing downwards"
+            },
+            {
+                "component": "products",
+                "key": "CarouselIconArrowLeft",
+                "value": "Arrow pointing to the left"
+            },
+            {
+                "component": "products",
+                "key": "CarouselIconArrowRight",
+                "value": "Arrow pointing to the right"
+            },
+            {
+                "component": "products",
+                "key": "CarouselIconArrowUp",
+                "value": "Arrow pointing upwards"
+            },
+            {
+                "component": "products",
+                "key": "CarouselItemXofY",
+                "value": "Item {currentSlide} of {slidesCount}"
+            },
+            {
+                "component": "products",
+                "key": "CatalogCode",
+                "value": "Code"
+            },
+            {
+                "component": "products",
+                "key": "CatalogCreateNewSuccess",
+                "value": "Catalog created successfully"
+            },
+            {
+                "component": "products",
+                "key": "CatalogDescription",
+                "value": "Description"
+            },
+            {
+                "component": "products",
+                "key": "CatalogTypeIsRequired",
+                "value": "CatalogType is required"
+            },
+            {
+                "component": "products",
+                "key": "CategoriesModalTitle",
+                "value": "Categories"
+            },
+            {
+                "component": "products",
+                "key": "CategoriesTabTitle",
+                "value": "Categories"
+            },
+            {
+                "component": "products",
+                "key": "CategorySuggestions",
+                "value": "Consider browsing releated matched \"Product Categories\""
+            },
+            {
+                "component": "products",
+                "key": "ChangeDisplayModeTo",
+                "value": "Change displaymode to:"
+            },
+            {
+                "component": "products",
+                "key": "CheckSpelling",
+                "value": "Check that all words are spelled correctly."
+            },
+            {
+                "component": "products",
+                "key": "Classifications",
+                "value": "Product Categories"
+            },
+            {
+                "component": "products",
+                "key": "Clear",
+                "value": "Clear Results"
+            },
+            {
+                "component": "products",
+                "key": "ClearAll",
+                "value": "Clear All"
+            },
+            {
+                "component": "products",
+                "key": "ClearProduct",
+                "value": "Clear"
+            },
+            {
+                "component": "products",
+                "key": "CollapseAllFilters",
+                "value": "Collapse All"
+            },
+            {
+                "component": "products",
+                "key": "CompanyCatalog",
+                "value": "Company Catalog"
+            },
+            {
+                "component": "products",
+                "key": "CompareDifferencesOnly",
+                "value": "Show Differences Only"
+            },
+            {
+                "component": "products",
+                "key": "CompareNoProductsSelected",
+                "value": "No products selected"
+            },
+            {
+                "component": "products",
+                "key": "CompareTableData",
+                "value": "Compare Table Data"
+            },
+            {
+                "component": "products",
+                "key": "Configurator",
+                "value": "Configurator"
+            },
+            {
+                "component": "products",
+                "key": "Configurators",
+                "value": "Configurators"
+            },
+            {
+                "component": "products",
+                "key": "ConfiguratorsNumberTitle",
+                "value": "Configurators available"
+            },
+            {
+                "component": "products",
+                "key": "ContactSupport",
+                "value": "Item possibly inactivated, please contact your Supplier Support for more information."
+            },
+            {
+                "component": "products",
+                "key": "DetailsTabTitle",
+                "value": "Details"
+            },
+            {
+                "component": "products",
+                "key": "DifferentKeywords",
+                "value": "Try different or more general keywords."
+            },
+            {
+                "component": "products",
+                "key": "DisplayModeGrid",
+                "value": "Grid"
+            },
+            {
+                "component": "products",
+                "key": "DisplayModeList",
+                "value": "List"
+            },
+            {
+                "component": "products",
+                "key": "DisplayModeTable",
+                "value": "Table"
+            },
+            {
+                "component": "products",
+                "key": "DownloadsNotAvailable",
+                "value": "No downloads available"
+            },
+            {
+                "component": "products",
+                "key": "DownloadsTabTitle",
+                "value": "Downloads"
+            },
+            {
+                "component": "products",
+                "key": "ExpandAllFilters",
+                "value": "Expand All"
+            },
+            {
+                "component": "products",
+                "key": "Export",
+                "value": "Export"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteCategories",
+                "value": "Favorite Categories"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteCategoriesAddCurrentCategory",
+                "value": "Add current category to favorites"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteCategoriesEmpty",
+                "value": "No favorites"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteCategoriesModalTitle",
+                "value": "Favorite Categories"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteCategoriesRemoveCurrentCategory",
+                "value": "Remove current category from favorites"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViews",
+                "value": "Favorite Views"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsCode",
+                "value": "Favorite view code"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsConfirmDelete",
+                "value": "Are you sure you want to delete view '{0}'?"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsEmpty",
+                "value": "No favorite views"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsHideMore",
+                "value": "Show less"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsModalTitle",
+                "value": "Favorite Views"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsNew",
+                "value": "New Favorite View"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsSave",
+                "value": "Save view"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsSaveTitle",
+                "value": "Save view"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsSaveTo",
+                "value": "Save to"
+            },
+            {
+                "component": "products",
+                "key": "FavoriteViewsShowMore",
+                "value": "Show more"
+            },
+            {
+                "component": "products",
+                "key": "FeedbackAlertSuccess",
+                "value": "Feedback sent successfully"
+            },
+            {
+                "component": "products",
+                "key": "FiltersPromoted",
+                "value": "Primary filters"
+            },
+            {
+                "component": "products",
+                "key": "FindFilterAttribute",
+                "value": "Find attribute..."
+            },
+            {
+                "component": "products",
+                "key": "FindFilterValue",
+                "value": "Find value..."
+            },
+            {
+                "component": "products",
+                "key": "FindProduct",
+                "value": "Find product..."
+            },
+            {
+                "component": "products",
+                "key": "FormLabelComments",
+                "value": "Comments"
+            },
+            {
+                "component": "products",
+                "key": "FormLabelEmail",
+                "value": "Email Address"
+            },
+            {
+                "component": "products",
+                "key": "FormLabelName",
+                "value": "Name"
+            },
+            {
+                "component": "products",
+                "key": "GeneralInfo",
+                "value": "General Information"
+            },
+            {
+                "component": "products",
+                "key": "GoToSection",
+                "value": "Go To Section"
+            },
+            {
+                "component": "products",
+                "key": "HideAllCategories",
+                "value": "Hide All Categories"
+            },
+            {
+                "component": "products",
+                "key": "HideMore",
+                "value": "Show less"
+            },
+            {
+                "component": "products",
+                "key": "In",
+                "value": "in"
+            },
+            {
+                "component": "products",
+                "key": "InteractiveGuidesHeader",
+                "value": "Interactive Guides"
+            },
+            {
+                "component": "products",
+                "key": "Keywords",
+                "value": "Keywords"
+            },
+            {
+                "component": "products",
+                "key": "LeaveFeedback",
+                "value": "Feedback"
+            },
+            {
+                "component": "products",
+                "key": "LeaveFeedbackModalTitle",
+                "value": "Feedback Comments and Assessment"
+            },
+            {
+                "component": "products",
+                "key": "LeaveFeedbackText",
+                "value": "Please provide your opinion for the quality of information found on this page"
+            },
+            {
+                "component": "products",
+                "key": "LinksTabTitle",
+                "value": "Related links"
+            },
+            {
+                "component": "products",
+                "key": "NarrowByProductClear",
+                "value": "Clear"
+            },
+            {
+                "component": "products",
+                "key": "NarrowByProductModalTitle",
+                "value": "Narrow By Product"
+            },
+            {
+                "component": "products",
+                "key": "NoCategories",
+                "value": "No categories to display"
+            },
+            {
+                "component": "products",
+                "key": "NoFilterValues",
+                "value": "No filter values to display"
+            },
+            {
+                "component": "products",
+                "key": "NoFilterValuesSearchFound",
+                "value": "No filter values meet your search criteria"
+            },
+            {
+                "component": "products",
+                "key": "NoFilteringResultsFound",
+                "value": "No filtering results found"
+            },
+            {
+                "component": "products",
+                "key": "NoFilters",
+                "value": "No filters to display"
+            },
+            {
+                "component": "products",
+                "key": "NoFiltersSearchFound",
+                "value": "No filters meet your search criteria"
+            },
+            {
+                "component": "products",
+                "key": "NoMasterProductsFound",
+                "value": "No master products found"
+            },
+            {
+                "component": "products",
+                "key": "NoProductResults",
+                "value": "No \"Product\" Results Found"
+            },
+            {
+                "component": "products",
+                "key": "NoResults",
+                "value": "No Results found"
+            },
+            {
+                "component": "products",
+                "key": "NoResultsInCategory",
+                "value": "No Results Found in Current Category"
+            },
+            {
+                "component": "products",
+                "key": "NoResultsWithAppliedFilters",
+                "value": "No Results Found With Applied Filters"
+            },
+            {
+                "component": "products",
+                "key": "NoSparePartTypes",
+                "value": "No spare part types to display"
+            },
+            {
+                "component": "products",
+                "key": "PageSize",
+                "value": "Page size"
+            },
+            {
+                "component": "products",
+                "key": "PartTypesModalTitle",
+                "value": "Spare Parts Type"
+            },
+            {
+                "component": "products",
+                "key": "PersonalCatalog",
+                "value": "Personal Catalog"
+            },
+            {
+                "component": "products",
+                "key": "PrintToPdf",
+                "value": "Print to PDF"
+            },
+            {
+                "component": "products",
+                "key": "ProductAddedToCatalogSuccess",
+                "value": "Product added to catalog successfully"
+            },
+            {
+                "component": "products",
+                "key": "ProductDescription",
+                "value": "Product description"
+            },
+            {
+                "component": "products",
+                "key": "ProductGallery",
+                "value": "Product Gallery"
+            },
+            {
+                "component": "products",
+                "key": "ProductIdIsRequired",
+                "value": "ProductId is required"
+            },
+            {
+                "component": "products",
+                "key": "ProductNotClassified",
+                "value": "Product is not classified"
+            },
+            {
+                "component": "products",
+                "key": "Quantity",
+                "value": "Quantity"
+            },
+            {
+                "component": "products",
+                "key": "RatingExcellent",
+                "value": "Excellent"
+            },
+            {
+                "component": "products",
+                "key": "RatingGood",
+                "value": "Good"
+            },
+            {
+                "component": "products",
+                "key": "RatingPoor",
+                "value": "Poor"
+            },
+            {
+                "component": "products",
+                "key": "RelatedLinksNotAvailable",
+                "value": "There are no related links available"
+            },
+            {
+                "component": "products",
+                "key": "RemoveBadgeTitle",
+                "value": "Remove"
+            },
+            {
+                "component": "products",
+                "key": "SearchButtonText",
+                "value": "Search"
+            },
+            {
+                "component": "products",
+                "key": "SearchProductsInputAriaLabel",
+                "value": "Search products"
+            },
+            {
+                "component": "products",
+                "key": "SearchProductsInputPlaceholder",
+                "value": "Search products..."
+            },
+            {
+                "component": "products",
+                "key": "SearchSparePartsInputAriaLabel",
+                "value": "Find Parts & Services"
+            },
+            {
+                "component": "products",
+                "key": "SearchSparePartsInputPlaceholder",
+                "value": "Find Parts & Services..."
+            },
+            {
+                "component": "products",
+                "key": "SearchTypeAllWords",
+                "value": "With All Words"
+            },
+            {
+                "component": "products",
+                "key": "SearchTypeExact",
+                "value": "Exact Phrase"
+            },
+            {
+                "component": "products",
+                "key": "SearchTypeMasterId",
+                "value": "With Product IDs"
+            },
+            {
+                "component": "products",
+                "key": "SearchTypeOneWord",
+                "value": "With Some Words"
+            },
+            {
+                "component": "products",
+                "key": "SelectFilter",
+                "value": "Please select one of the filters"
+            },
+            {
+                "component": "products",
+                "key": "SelectProduct",
+                "value": "Select product..."
+            },
+            {
+                "component": "products",
+                "key": "SelectVariant",
+                "value": "Select variant"
+            },
+            {
+                "component": "products",
+                "key": "SendFeedbackBtn",
+                "value": "Send feedback"
+            },
+            {
+                "component": "products",
+                "key": "Show",
+                "value": "Show"
+            },
+            {
+                "component": "products",
+                "key": "ShowAllCategories",
+                "value": "Show all categories"
+            },
+            {
+                "component": "products",
+                "key": "ShowAllFilters",
+                "value": "Show all filters"
+            },
+            {
+                "component": "products",
+                "key": "ShowMore",
+                "value": "Show more"
+            },
+            {
+                "component": "products",
+                "key": "ShowPrintView",
+                "value": "Print View"
+            },
+            {
+                "component": "products",
+                "key": "ShowingNOfAllCategories",
+                "value": "{0} in all categories"
+            },
+            {
+                "component": "products",
+                "key": "ShowingNOfCurrentCategory",
+                "value": "{0} in current category"
+            },
+            {
+                "component": "products",
+                "key": "ShowingNOfNMatches",
+                "value": "Showing {0} of {1} matches"
+            },
+            {
+                "component": "products",
+                "key": "ShowingNWithoutFilters",
+                "value": "{0} without applied filters"
+            },
+            {
+                "component": "products",
+                "key": "SortBy",
+                "value": "Sort by"
+            },
+            {
+                "component": "products",
+                "key": "SortByProduct",
+                "value": "Product"
+            },
+            {
+                "component": "products",
+                "key": "SortByRelevance",
+                "value": "Relevance"
+            },
+            {
+                "component": "products",
+                "key": "SparePartsOf",
+                "value": "Spare Parts for"
+            },
+            {
+                "component": "products",
+                "key": "Suggestions",
+                "value": "Suggestions"
+            },
+            {
+                "component": "products",
+                "key": "TooManyMasterProducts",
+                "value": "Continue navigating to see products if available"
+            },
+            {
+                "component": "products",
+                "key": "UnitOfMeasure",
+                "value": "Unit Of Measure"
+            },
+            {
+                "component": "products",
+                "key": "Variant",
+                "value": "Variant"
+            },
+            {
+                "component": "products",
+                "key": "VariantProducts",
+                "value": "Product Variants"
+            },
+            {
+                "component": "products",
+                "key": "Variants",
+                "value": "Variants"
+            },
+            {
+                "component": "products",
+                "key": "VariantsAvailable",
+                "value": "Variants Available"
+            },
+            {
+                "component": "products",
+                "key": "ViewDetails",
+                "value": "View Details"
+            },
+            {
+                "component": "products",
+                "key": "ZoomInTitle",
+                "value": "Click to enlarge the image"
+            }
+        ],
+        "Product": {
+            "productDetails": {
+                "item": {
+                    "inactive": false,
+                    "images": [
+                        {
+                            "url": "https://cdn.productimages.abb.com/9IBA248849_400x400.png",
+                            "thumbnailUrl": "https://cdn.productimages.abb.com/9IBA248849_100x100.png",
+                            "masterUrl": "https://cdn.productimages.abb.com/9IBA248849_master.png"
+                        },
+                        {
+                            "url": "https://cdn.productimages.abb.com/9IBA248850_400x400.png",
+                            "thumbnailUrl": "https://cdn.productimages.abb.com/9IBA248850_100x100.png",
+                            "masterUrl": "https://cdn.productimages.abb.com/9IBA248850_master.png"
+                        },
+                        {
+                            "url": "https://cdn.productimages.abb.com/9IBA248851_400x400.png",
+                            "thumbnailUrl": "https://cdn.productimages.abb.com/9IBA248851_100x100.png",
+                            "masterUrl": "https://cdn.productimages.abb.com/9IBA248851_master.png"
+                        }
+                    ],
+                    "published": true,
+                    "allRelationships": [
+                        {
+                            "relationshipCode": "ELSP_SV_Frame XT2 with 3 poles",
+                            "relationshipType": "Accessories"
+                        }
+                    ],
+                    "variantsAvailable": false,
+                    "productIdDomain": "ABB",
+                    "sparePart": false,
+                    "exactMatch": false,
+                    "classifications": {
+                        "classCids": [
+                            "9AAC167301"
+                        ],
+                        "typeCids": [
+                            "9AAC167318"
+                        ],
+                        "leafCids": [
+                            "9AAC167318"
+                        ],
+                        "level0Cids": [
+                            "9AAC910006"
+                        ]
+                    },
+                    "productId": "1SDA067017R1",
+                    "attributes": {
+                        "ExtendedProductType": {
+                            "type": "Text",
+                            "attributeCode": "ExtendedProductType",
+                            "attributeName": "Extended Product Type",
+                            "values": [
+                                {
+                                    "text": "XT2N 160 TMA 80-800 3p F F"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        },
+                        "ProductId": {
+                            "type": "Text",
+                            "attributeCode": "ProductId",
+                            "attributeName": "Product ID",
+                            "values": [
+                                {
+                                    "text": "1SDA067017R1"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        },
+                        "Ean": {
+                            "type": "Text",
+                            "attributeCode": "Ean",
+                            "attributeName": "EAN",
+                            "values": [
+                                {
+                                    "text": "8015644009236"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        },
+                        "CatalogDescription": {
+                            "type": "Text",
+                            "attributeCode": "CatalogDescription",
+                            "attributeName": "Catalog Description",
+                            "values": [
+                                {
+                                    "text": "XT2N 160 TMA 80-800 3p F F"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        },
+                        "LongDescription": {
+                            "type": "Text",
+                            "attributeCode": "LongDescription",
+                            "attributeName": "Long Description",
+                            "values": [
+                                {
+                                    "text": "C.BREAKER TMAX XT2N 160 FIXED THREE-POLE WITH FRONT TERMINALS AND THERMOMAGNETIC RELEASE TMA R 80 I3=400...800 A"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        },
+                        "#DisplayName": {
+                            "type": "Text",
+                            "attributeCode": "#DisplayName",
+                            "attributeName": "Display Name",
+                            "values": [
+                                {
+                                    "text": "XT2N 160 TMA 80-800 3p F F"
+                                }
+                            ],
+                            "isInternal": false,
+                            "internal": false,
+                            "highlight": false
+                        }
+                    }
+                }
+            },
+            "attributeGroups": {
+                "items": [
+                    {
+                        "code": "AbbEcoSolutions",
+                        "description": "ABB EcoSolutions",
+                        "visible": true,
+                        "attributes": {
+                            "AbbEcoSolutions": {
+                                "type": "Enum",
+                                "attributeCode": "AbbEcoSolutions",
+                                "attributeName": "ABB EcoSolutions",
+                                "values": [
+                                    {
+                                        "text": "Yes",
+                                        "enumerationValueCode": "Y"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "AbbSitMeeGroWasLanTar": {
+                                "type": "Enum",
+                                "attributeCode": "AbbSitMeeGroWasLanTar",
+                                "attributeName": "ABB Site Meeting Group Waste To Landfill Target",
+                                "values": [
+                                    {
+                                        "text": "UL 2799 Zero Waste To Landfill Validation available",
+                                        "enumerationValueCode": "Ul2788ZeWaToLaVaAv"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "EndOfLifDisIns": {
+                                "type": "Text",
+                                "attributeCode": "EndOfLifDisIns",
+                                "attributeName": "End Of Life Disassembling Instructions",
+                                "values": [
+                                    {
+                                        "text": "9AKK108468A2348",
+                                        "link": {
+                                            "text": "9AKK108468A2348",
+                                            "documentId": "9AKK108468A2348",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "EnvProDecEpd": {
+                                "type": "Text",
+                                "attributeCode": "EnvProDecEpd",
+                                "attributeName": "Environmental Product Declaration - EPD",
+                                "values": [
+                                    {
+                                        "text": "9AKK108469A1856",
+                                        "link": {
+                                            "text": "9AKK108469A1856",
+                                            "documentId": "9AKK108469A1856",
+                                            "type": "Document"
+                                        }
+                                    },
+                                    {
+                                        "text": "9AKK108468A1891",
+                                        "link": {
+                                            "text": "9AKK108468A1891",
+                                            "documentId": "9AKK108468A1891",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ExtProLif": {
+                                "type": "Enum",
+                                "attributeCode": "ExtProLif",
+                                "attributeName": "Extended Product Lifetime",
+                                "values": [
+                                    {
+                                        "text": "Product Modularity",
+                                        "enumerationValueCode": "ProductModularity"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RecRatProAccToEn45555": {
+                                "type": "Text",
+                                "attributeCode": "RecRatProAccToEn45555",
+                                "attributeName": "Recyclability Rate of the Product acc. to EN45555",
+                                "values": [
+                                    {
+                                        "text": "Design for Closing Resource Loops - Standard EN45555 -  55.70 %"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "MaterialCompliance",
+                        "description": "Material Compliance",
+                        "visible": true,
+                        "attributes": {
+                            "ReachDeclaration": {
+                                "type": "Text",
+                                "attributeCode": "ReachDeclaration",
+                                "attributeName": "REACH Declaration",
+                                "values": [
+                                    {
+                                        "text": "9AKK108466A1425",
+                                        "link": {
+                                            "text": "9AKK108466A1425",
+                                            "documentId": "9AKK108466A1425",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RoHSInformation": {
+                                "type": "Text",
+                                "attributeCode": "RoHSInformation",
+                                "attributeName": "RoHS Declaration",
+                                "values": [
+                                    {
+                                        "text": "9AKK108466A1424",
+                                        "link": {
+                                            "text": "9AKK108466A1424",
+                                            "documentId": "9AKK108466A1424",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RoHSStatus": {
+                                "type": "Enum",
+                                "attributeCode": "RoHSStatus",
+                                "attributeName": "RoHS Information",
+                                "values": [
+                                    {
+                                        "text": "Following EU Directive 2011/65/EU and Amendment 2015/863 July 22, 2019",
+                                        "enumerationValueCode": "20190722"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ConMinRepTem": {
+                                "type": "Text",
+                                "attributeCode": "ConMinRepTem",
+                                "attributeName": "Conflict Minerals Reporting Template (CMRT)",
+                                "values": [
+                                    {
+                                        "text": "9AKK108467A5658",
+                                        "link": {
+                                            "text": "9AKK108467A5658",
+                                            "documentId": "9AKK108467A5658",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ToxSubConAct": {
+                                "type": "Text",
+                                "attributeCode": "ToxSubConAct",
+                                "attributeName": "Toxic Substances Control Act - TSCA",
+                                "values": [
+                                    {
+                                        "text": "9AKK108467A8326",
+                                        "link": {
+                                            "text": "9AKK108467A8326",
+                                            "documentId": "9AKK108467A8326",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Scip": {
+                                "type": "Text",
+                                "attributeCode": "Scip",
+                                "attributeName": "SCIP",
+                                "values": [
+                                    {
+                                        "text": "69c4e18d-0ab2-4944-943a-82f8a020de52 Italy"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "SimplifiedScip": {
+                                "type": "Text",
+                                "attributeCode": "SimplifiedScip",
+                                "attributeName": "Simplified SCIP",
+                                "values": [
+                                    {
+                                        "text": "eb1e3c1e-203f-48c5-9708-06b205da319e Hungary"
+                                    },
+                                    {
+                                        "text": "d4c1fc83-b7ed-45f8-a5cc-8f567b6d773d Spain"
+                                    },
+                                    {
+                                        "text": "4cc3c653-7baf-4337-8869-c8ebc51f661b Belgium"
+                                    },
+                                    {
+                                        "text": "07200370-2e05-4b60-8e4c-3123aebccf04 France"
+                                    },
+                                    {
+                                        "text": "6a3a9ec7-3143-435f-b25b-dc8ae2e7e3c7 Hungary"
+                                    },
+                                    {
+                                        "text": "984127c1-5e8f-4bbc-92df-180ca4bf29a3 Czechia"
+                                    },
+                                    {
+                                        "text": "502d54f4-b093-428a-98b6-d7f269f2ab0d Portugal"
+                                    },
+                                    {
+                                        "text": "a277c07b-35fe-4a25-bc38-a72356fcd288 Germany"
+                                    },
+                                    {
+                                        "text": "8bb7566d-79b8-4aad-bcf4-b1b62344c024 Denmark"
+                                    },
+                                    {
+                                        "text": "1a6af640-1a22-4044-92cf-227622596731 Sweden"
+                                    },
+                                    {
+                                        "text": "826ca3db-9ce4-463b-b329-6f9fa8e6cec2 Germany"
+                                    },
+                                    {
+                                        "text": "b3b85b81-a17a-4656-ba48-098625f79ebe Germany"
+                                    },
+                                    {
+                                        "text": "5aaa7d00-e450-4b8b-9cbc-7197dd2a10a7 Croatia"
+                                    },
+                                    {
+                                        "text": "a2fd7051-38f1-488e-994d-2665dafc0f05 Norway"
+                                    },
+                                    {
+                                        "text": "e6546c71-b740-4ac3-8e2b-a96172d5cc7d Netherlands"
+                                    },
+                                    {
+                                        "text": "45cbb033-9e0a-4a0f-a2b5-e52467a24a6c Sweden"
+                                    },
+                                    {
+                                        "text": "0ae5f635-2c9c-4d6d-b444-cddbbe53e6c5 Bulgaria"
+                                    },
+                                    {
+                                        "text": "f0d8fd84-336c-4aae-8237-e08eccbdfe0b Poland"
+                                    },
+                                    {
+                                        "text": "05f0b095-37ed-42d5-aee5-3791ab7894e2 Poland"
+                                    },
+                                    {
+                                        "text": "8348c1cc-caae-49a9-adaf-239bd22e462e Germany"
+                                    },
+                                    {
+                                        "text": "a263a282-fbc2-45f9-9e64-6e4ece74e656 Germany"
+                                    },
+                                    {
+                                        "text": "35dd4cc5-65fb-47a4-8016-ca2541885a03 Belgium"
+                                    },
+                                    {
+                                        "text": "831d7733-fe2a-464d-93fe-91118cf67e37 Estonia"
+                                    },
+                                    {
+                                        "text": "bb975baa-d139-4aa7-b229-f170636feaf2 Greece"
+                                    },
+                                    {
+                                        "text": "d205e574-9a51-4c78-bdfe-fb33c3141c34 France"
+                                    },
+                                    {
+                                        "text": "8a96586b-6dac-4e38-9db5-aca801a4ab55 Finland"
+                                    },
+                                    {
+                                        "text": "1ae9475f-f7ca-4749-af88-21bbff37765a Poland"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "Environmental",
+                        "description": "Environmental",
+                        "visible": true,
+                        "attributes": {
+                            "EnvInf": {
+                                "type": "Text",
+                                "attributeCode": "EnvInf",
+                                "attributeName": "Environmental Information",
+                                "values": [
+                                    {
+                                        "text": "9AKK108467A6707",
+                                        "link": {
+                                            "text": "9AKK108467A6707",
+                                            "documentId": "9AKK108467A6707",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "Ordering",
+                        "description": "Ordering",
+                        "visible": true,
+                        "attributes": {
+                            "LocOrdCodUSCON": {
+                                "type": "Text",
+                                "attributeCode": "LocOrdCodUSCON",
+                                "attributeName": "Order Code US and Canada",
+                                "values": [
+                                    {
+                                        "text": "XT2NE3080BFF000XXX"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ENumberFI": {
+                                "type": "Text",
+                                "attributeCode": "ENumberFI",
+                                "attributeName": "E-Number (Finland)",
+                                "values": [
+                                    {
+                                        "text": "3638651"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ENumberNO": {
+                                "type": "Text",
+                                "attributeCode": "ENumberNO",
+                                "attributeName": "E-Number (Norway)",
+                                "values": [
+                                    {
+                                        "text": "4309643"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Ean": {
+                                "type": "Text",
+                                "attributeCode": "Ean",
+                                "attributeName": "EAN",
+                                "values": [
+                                    {
+                                        "text": "8015644009236"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "MinimumOrderQuantity": {
+                                "type": "Text",
+                                "attributeCode": "MinimumOrderQuantity",
+                                "attributeName": "Minimum Order Quantity",
+                                "values": [
+                                    {
+                                        "text": "1 piece"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "CustomsTariffNumber": {
+                                "type": "Text",
+                                "attributeCode": "CustomsTariffNumber",
+                                "attributeName": "Customs Tariff Number",
+                                "values": [
+                                    {
+                                        "text": "85362090"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "Dimensions",
+                        "description": "Dimensions",
+                        "visible": true,
+                        "attributes": {
+                            "ProductNetWidth": {
+                                "type": "Text",
+                                "attributeCode": "ProductNetWidth",
+                                "attributeName": "Product Net Width",
+                                "values": [
+                                    {
+                                        "text": "90 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "tooltip": "Width of a single unpacked product",
+                                "highlight": false
+                            },
+                            "ProductNetHeight": {
+                                "type": "Text",
+                                "attributeCode": "ProductNetHeight",
+                                "attributeName": "Product Net Height",
+                                "values": [
+                                    {
+                                        "text": "130 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "tooltip": "Height of a single unpacked product",
+                                "highlight": false
+                            },
+                            "ProductNetDepth": {
+                                "type": "Text",
+                                "attributeCode": "ProductNetDepth",
+                                "attributeName": "Product Net Depth / Length",
+                                "values": [
+                                    {
+                                        "text": "82.5 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "tooltip": "Depth of a single unpacked product",
+                                "highlight": false
+                            },
+                            "ProductNetWeight": {
+                                "type": "Text",
+                                "attributeCode": "ProductNetWeight",
+                                "attributeName": "Product Net Weight",
+                                "values": [
+                                    {
+                                        "text": "1.4 kg"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "tooltip": "Weight of a single unpacked product",
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "ConInf",
+                        "description": "Container Information",
+                        "visible": true,
+                        "attributes": {
+                            "PackageLevel1Units": {
+                                "type": "Text",
+                                "attributeCode": "PackageLevel1Units",
+                                "attributeName": "Package Level 1 Units",
+                                "values": [
+                                    {
+                                        "text": "box 1 piece"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PackageLevel1Width": {
+                                "type": "Text",
+                                "attributeCode": "PackageLevel1Width",
+                                "attributeName": "Package Level 1 Width",
+                                "values": [
+                                    {
+                                        "text": "130 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PackageLevel1Height": {
+                                "type": "Text",
+                                "attributeCode": "PackageLevel1Height",
+                                "attributeName": "Package Level 1 Height",
+                                "values": [
+                                    {
+                                        "text": "208 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PackageLevel1Length": {
+                                "type": "Text",
+                                "attributeCode": "PackageLevel1Length",
+                                "attributeName": "Package Level 1 Depth / Length",
+                                "values": [
+                                    {
+                                        "text": "145 mm"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PacLev1GroWei": {
+                                "type": "Text",
+                                "attributeCode": "PacLev1GroWei",
+                                "attributeName": "Package Level 1 Gross Weight",
+                                "values": [
+                                    {
+                                        "text": "1.667 kg"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PackageLevel1Ean": {
+                                "type": "Text",
+                                "attributeCode": "PackageLevel1Ean",
+                                "attributeName": "Package Level 1 EAN",
+                                "values": [
+                                    {
+                                        "text": "8015644009236"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "AddInf",
+                        "description": "Additional Information",
+                        "visible": true,
+                        "attributes": {
+                            "CirBreTypToBeAss": {
+                                "type": "Enum",
+                                "attributeCode": "CirBreTypToBeAss",
+                                "attributeName": "Circuit Breaker Type to be Associated",
+                                "values": [
+                                    {
+                                        "text": "Power Distribution",
+                                        "enumerationValueCode": "PowerDistribution"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ProductMainType": {
+                                "type": "Text",
+                                "attributeCode": "ProductMainType",
+                                "attributeName": "Product Main Type",
+                                "values": [
+                                    {
+                                        "text": "SACE Tmax XT"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ProductName": {
+                                "type": "Text",
+                                "attributeCode": "ProductName",
+                                "attributeName": "Product Name",
+                                "values": [
+                                    {
+                                        "text": "Moulded Case Circuit Breaker"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ProductType": {
+                                "type": "Text",
+                                "attributeCode": "ProductType",
+                                "attributeName": "Product Type",
+                                "values": [
+                                    {
+                                        "text": "Automatic Circuit Breaker"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Version": {
+                                "type": "Enum",
+                                "attributeCode": "Version",
+                                "attributeName": "Version",
+                                "values": [
+                                    {
+                                        "text": "F",
+                                        "enumerationValueCode": "F"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "CadDimensionalDrawing": {
+                                "type": "Text",
+                                "attributeCode": "CadDimensionalDrawing",
+                                "attributeName": "CAD Dimensional Drawing",
+                                "values": [
+                                    {
+                                        "text": "1SDH002230A1001",
+                                        "link": {
+                                            "text": "1SDH002230A1001",
+                                            "documentId": "1SDH002230A1001",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "Technical",
+                        "description": "Technical",
+                        "visible": true,
+                        "attributes": {
+                            "ConCapMaiCon": {
+                                "type": "Text",
+                                "attributeCode": "ConCapMaiCon",
+                                "attributeName": "Connecting Capacity Main Circuit",
+                                "values": [
+                                    {
+                                        "text": "Busbar 32.5..100 mm\u00b2"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "CurrentType": {
+                                "type": "Text",
+                                "attributeCode": "CurrentType",
+                                "attributeName": "Current Type",
+                                "values": [
+                                    {
+                                        "text": "AC/DC"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ElectricalDurability": {
+                                "type": "Text",
+                                "attributeCode": "ElectricalDurability",
+                                "attributeName": "Electrical Durability",
+                                "values": [
+                                    {
+                                        "text": "120 cycles per hour"
+                                    },
+                                    {
+                                        "text": "8000 cycle"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "MechanicalDurability": {
+                                "type": "Text",
+                                "attributeCode": "MechanicalDurability",
+                                "attributeName": "Mechanical Durability",
+                                "values": [
+                                    {
+                                        "text": "240 cycles per hour"
+                                    },
+                                    {
+                                        "text": "25000 cycle"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "NumberOfPoles": {
+                                "type": "Enum",
+                                "attributeCode": "NumberOfPoles",
+                                "attributeName": "Number of Poles",
+                                "values": [
+                                    {
+                                        "text": "3P",
+                                        "enumerationValueCode": "3"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "OpeningTime": {
+                                "type": "Text",
+                                "attributeCode": "OpeningTime",
+                                "attributeName": "Opening Time",
+                                "values": [
+                                    {
+                                        "text": "CB with SOR 30 ms"
+                                    },
+                                    {
+                                        "text": "CB with UVR  30 ms"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "OrderMultiple": {
+                                "type": "Text",
+                                "attributeCode": "OrderMultiple",
+                                "attributeName": "Order Multiple",
+                                "values": [
+                                    {
+                                        "text": "1 piece"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "PowerLoss": {
+                                "type": "Text",
+                                "attributeCode": "PowerLoss",
+                                "attributeName": "Power Loss",
+                                "values": [
+                                    {
+                                        "text": "at Rated Operating Conditions per Pole 5.8 W"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatedCurrent": {
+                                "type": "Text",
+                                "attributeCode": "RatedCurrent",
+                                "attributeName": "Rated Current (I<sub>n</sub>)",
+                                "values": [
+                                    {
+                                        "text": "80 A"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatedFrequency": {
+                                "type": "Text",
+                                "attributeCode": "RatedFrequency",
+                                "attributeName": "Rated Frequency (f)",
+                                "values": [
+                                    {
+                                        "text": "50 / 60 Hz"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatImpWitVol": {
+                                "type": "Text",
+                                "attributeCode": "RatImpWitVol",
+                                "attributeName": "Rated Impulse Withstand Voltage (U<sub>imp</sub>)",
+                                "values": [
+                                    {
+                                        "text": "8 kV"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatInsShoCirCurSet": {
+                                "type": "Text",
+                                "attributeCode": "RatInsShoCirCurSet",
+                                "attributeName": "Rated Instantaneous Short-Circuit Current Setting (I<sub>i</sub>)",
+                                "values": [
+                                    {
+                                        "text": "400\u2026800 A"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatInsVol": {
+                                "type": "Text",
+                                "attributeCode": "RatInsVol",
+                                "attributeName": "Rated Insulation Voltage (U<sub>i</sub>)",
+                                "values": [
+                                    {
+                                        "text": "1000 V"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatOpeVol": {
+                                "type": "Text",
+                                "attributeCode": "RatOpeVol",
+                                "attributeName": "Rated Operational Voltage",
+                                "values": [
+                                    {
+                                        "text": "690 V AC"
+                                    },
+                                    {
+                                        "text": "500 V DC"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatSerShoCirBreCap": {
+                                "type": "Text",
+                                "attributeCode": "RatSerShoCirBreCap",
+                                "attributeName": "Rated Service Short-Circuit Breaking Capacity (I<sub>cs</sub>)",
+                                "values": [
+                                    {
+                                        "text": "(220 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(230 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(240 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(380 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(415 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(440 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(500 V AC) 30 kA"
+                                    },
+                                    {
+                                        "text": "(525 V AC) 20 kA"
+                                    },
+                                    {
+                                        "text": "(690 V AC) 10 kA"
+                                    },
+                                    {
+                                        "text": "(250 V DC) 2 Poles in Series 36 kA"
+                                    },
+                                    {
+                                        "text": "(500 V DC) 3 Poles in Series 36 kA"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatUltShoCirBreCap": {
+                                "type": "Text",
+                                "attributeCode": "RatUltShoCirBreCap",
+                                "attributeName": "Rated Ultimate Short-Circuit Breaking Capacity (I<sub>cu</sub>)",
+                                "values": [
+                                    {
+                                        "text": "(220 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(230 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(240 V AC) 65 kA"
+                                    },
+                                    {
+                                        "text": "(380 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(415 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(440 V AC) 36 kA"
+                                    },
+                                    {
+                                        "text": "(500 V AC) 30 kA"
+                                    },
+                                    {
+                                        "text": "(525 V AC) 20 kA"
+                                    },
+                                    {
+                                        "text": "(690 V AC) 10 kA"
+                                    },
+                                    {
+                                        "text": "(250 V DC) 2 Poles in Series 36 kA"
+                                    },
+                                    {
+                                        "text": "(500 V DC) 3 Poles in Series 36 kA"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatUniCur": {
+                                "type": "Text",
+                                "attributeCode": "RatUniCur",
+                                "attributeName": "Rated Uninterrupted Current (I<sub>u</sub>)",
+                                "values": [
+                                    {
+                                        "text": "160 A"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RatedVoltage": {
+                                "type": "Text",
+                                "attributeCode": "RatedVoltage",
+                                "attributeName": "Rated Voltage (U<sub>r</sub>)",
+                                "values": [
+                                    {
+                                        "text": "690 V"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "RecScrDri": {
+                                "type": "Text",
+                                "attributeCode": "RecScrDri",
+                                "attributeName": "Recommended Screw Driver",
+                                "values": [
+                                    {
+                                        "text": "Main Circuit M6"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Release": {
+                                "type": "Enum",
+                                "attributeCode": "Release",
+                                "attributeName": "Release",
+                                "values": [
+                                    {
+                                        "text": "TMA",
+                                        "enumerationValueCode": "Tma"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ReleaseType": {
+                                "type": "Text",
+                                "attributeCode": "ReleaseType",
+                                "attributeName": "Release Type",
+                                "values": [
+                                    {
+                                        "text": "TM"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "SettingRange": {
+                                "type": "Text",
+                                "attributeCode": "SettingRange",
+                                "attributeName": "Setting Range",
+                                "values": [
+                                    {
+                                        "text": "56...80 A"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ShoCirPerLev": {
+                                "type": "Enum",
+                                "attributeCode": "ShoCirPerLev",
+                                "attributeName": "Short-Circuit Performance Level",
+                                "values": [
+                                    {
+                                        "text": "N",
+                                        "enumerationValueCode": "N"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Standards": {
+                                "type": "Text",
+                                "attributeCode": "Standards",
+                                "attributeName": "Standards",
+                                "values": [
+                                    {
+                                        "text": "IEC60947-2"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "SubType": {
+                                "type": "Text",
+                                "attributeCode": "SubType",
+                                "attributeName": "Sub-type",
+                                "values": [
+                                    {
+                                        "text": "XT2"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "TerConTyp": {
+                                "type": "Enum",
+                                "attributeCode": "TerConTyp",
+                                "attributeName": "Terminal Connection Type",
+                                "values": [
+                                    {
+                                        "text": "Front",
+                                        "enumerationValueCode": "FR"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "TerminalType": {
+                                "type": "Enum",
+                                "attributeCode": "TerminalType",
+                                "attributeName": "Terminal Type",
+                                "values": [
+                                    {
+                                        "text": "Bolt",
+                                        "enumerationValueCode": "Bolt"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "TighteningTorque": {
+                                "type": "Text",
+                                "attributeCode": "TighteningTorque",
+                                "attributeName": "Tightening Torque",
+                                "values": [
+                                    {
+                                        "text": "6 N\u00b7m"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "CerDec",
+                        "description": "Certificates and Declarations",
+                        "visible": true,
+                        "attributes": {
+                            "AtexCertificate": {
+                                "type": "Text",
+                                "attributeCode": "AtexCertificate",
+                                "attributeName": "ATEX Certificate",
+                                "values": [
+                                    {
+                                        "text": "No certification needed",
+                                        "link": {
+                                            "text": "No certification needed",
+                                            "documentId": "No certification needed",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "DatSheTecInf": {
+                                "type": "Text",
+                                "attributeCode": "DatSheTecInf",
+                                "attributeName": "Data Sheet, Technical Information",
+                                "values": [
+                                    {
+                                        "text": "1SDC210100D0206",
+                                        "link": {
+                                            "text": "1SDC210100D0206",
+                                            "documentId": "1SDC210100D0206",
+                                            "type": "Document"
+                                        }
+                                    },
+                                    {
+                                        "text": "1SDC210099D0206",
+                                        "link": {
+                                            "text": "1SDC210099D0206",
+                                            "documentId": "1SDC210099D0206",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "DecConCe": {
+                                "type": "Text",
+                                "attributeCode": "DecConCe",
+                                "attributeName": "Declaration of Conformity - CE",
+                                "values": [
+                                    {
+                                        "text": "9AKK106713A5901",
+                                        "link": {
+                                            "text": "9AKK106713A5901",
+                                            "documentId": "9AKK106713A5901",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "GlCertificate": {
+                                "type": "Text",
+                                "attributeCode": "GlCertificate",
+                                "attributeName": "GL Certificate",
+                                "values": [
+                                    {
+                                        "text": "1SDL000163R0093",
+                                        "link": {
+                                            "text": "1SDL000163R0093",
+                                            "documentId": "1SDL000163R0093",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "LrCertificate": {
+                                "type": "Text",
+                                "attributeCode": "LrCertificate",
+                                "attributeName": "LR Certificate",
+                                "values": [
+                                    {
+                                        "text": "1SDL000163R0100",
+                                        "link": {
+                                            "text": "1SDL000163R0100",
+                                            "documentId": "1SDL000163R0100",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "UlCertificate": {
+                                "type": "Text",
+                                "attributeCode": "UlCertificate",
+                                "attributeName": "UL Certificate",
+                                "values": [
+                                    {
+                                        "text": "No certification needed",
+                                        "link": {
+                                            "text": "No certification needed",
+                                            "documentId": "No certification needed",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "VdeCertificate": {
+                                "type": "Text",
+                                "attributeCode": "VdeCertificate",
+                                "attributeName": "VDE Certificate",
+                                "values": [
+                                    {
+                                        "text": "No certification needed",
+                                        "link": {
+                                            "text": "No certification needed",
+                                            "documentId": "No certification needed",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "DimensionDiagram": {
+                                "type": "Text",
+                                "attributeCode": "DimensionDiagram",
+                                "attributeName": "Dimension Diagram",
+                                "values": [
+                                    {
+                                        "text": "1SDH000721R0100",
+                                        "link": {
+                                            "text": "1SDH000721R0100",
+                                            "documentId": "1SDH000721R0100",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "MechanicalDrawings": {
+                                "type": "Text",
+                                "attributeCode": "MechanicalDrawings",
+                                "attributeName": "Mechanical Drawings",
+                                "values": [
+                                    {
+                                        "text": "1SDH000721R0100",
+                                        "link": {
+                                            "text": "1SDH000721R0100",
+                                            "documentId": "1SDH000721R0100",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "WiringDiagram": {
+                                "type": "Text",
+                                "attributeCode": "WiringDiagram",
+                                "attributeName": "Wiring Diagram",
+                                "values": [
+                                    {
+                                        "text": "1SDM000068R0001",
+                                        "link": {
+                                            "text": "1SDM000068R0001",
+                                            "documentId": "1SDM000068R0001",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "InsMan": {
+                                "type": "Text",
+                                "attributeCode": "InsMan",
+                                "attributeName": "Instructions and Manuals",
+                                "values": [
+                                    {
+                                        "text": "1SDH000721R0001",
+                                        "link": {
+                                            "text": "1SDH000721R0001",
+                                            "documentId": "1SDH000721R0001",
+                                            "type": "Document"
+                                        }
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    },
+                    {
+                        "code": "Classifications",
+                        "description": "External Classifications and Standards",
+                        "visible": true,
+                        "attributes": {
+                            "Etim9": {
+                                "type": "Enum",
+                                "attributeCode": "Etim9",
+                                "attributeName": "ETIM 9",
+                                "values": [
+                                    {
+                                        "text": "EC000228 - Power circuit-breaker for trafo/generator/installation protection",
+                                        "enumerationValueCode": "EC000228"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Etim10": {
+                                "type": "Enum",
+                                "attributeCode": "Etim10",
+                                "attributeName": "ETIM 10",
+                                "values": [
+                                    {
+                                        "text": "EC000228 - Power circuit-breaker for trafo/generator/installation protection",
+                                        "enumerationValueCode": "EC000228"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "ObjClaCod": {
+                                "type": "Text",
+                                "attributeCode": "ObjClaCod",
+                                "attributeName": "Object Classification Code",
+                                "values": [
+                                    {
+                                        "text": "Q"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Unspsc": {
+                                "type": "Text",
+                                "attributeCode": "Unspsc",
+                                "attributeName": "UNSPSC",
+                                "values": [
+                                    {
+                                        "text": "39120000"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "WeeeCategory": {
+                                "type": "Enum",
+                                "attributeCode": "WeeeCategory",
+                                "attributeName": "WEEE Category",
+                                "values": [
+                                    {
+                                        "text": "5. Small Equipment (No External Dimension More Than 50 cm)",
+                                        "enumerationValueCode": "5SmallEquipment"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            },
+                            "Eclass": {
+                                "type": "Text",
+                                "attributeCode": "Eclass",
+                                "attributeName": "eClass",
+                                "values": [
+                                    {
+                                        "text": "V11.1 : 27370409"
+                                    }
+                                ],
+                                "isInternal": false,
+                                "internal": false,
+                                "highlight": false
+                            }
+                        }
+                    }
+                ]
+            },
+            "productClassifications": {
+                "items": {
+                    "Products": [
+                        [
+                            {
+                                "cid": "ROOT",
+                                "name": "Products",
+                                "inactive": false
+                            },
+                            {
+                                "cid": "9AAC910006",
+                                "name": "Low Voltage Products and Systems",
+                                "inactive": false
+                            },
+                            {
+                                "cid": "9AAC100085",
+                                "name": "Circuit Breakers",
+                                "inactive": false
+                            },
+                            {
+                                "cid": "9AAC100091",
+                                "name": "Moulded Case Circuit Breakers",
+                                "inactive": false
+                            },
+                            {
+                                "cid": "9AAC167301",
+                                "name": "Tmax XT",
+                                "inactive": false
+                            }
+                        ]
+                    ]
+                }
+            },
+            "productRelationships": {
+                "items": [
+                    {
+                        "code": "ELSP_SV_Frame XT2 with 3 poles",
+                        "description": "Accessories",
+                        "type": "Accessories",
+                        "table": {
+                            "columns": [
+                                {
+                                    "text": "Identifier",
+                                    "dataField": "Identifier"
+                                },
+                                {
+                                    "text": "Description",
+                                    "dataField": "Description"
+                                },
+                                {
+                                    "text": "Type",
+                                    "dataField": "Type"
+                                },
+                                {
+                                    "text": "Qty",
+                                    "dataField": "Quantity"
+                                },
+                                {
+                                    "text": "Unit Of Measure",
+                                    "dataField": "UnitOfMeasure"
+                                }
+                            ],
+                            "rows": [
+                                {
+                                    "values": {
+                                        "Identifier": [
+                                            {
+                                                "text": "1SDA066307R1",
+                                                "link": {
+                                                    "text": "1SDA066307R1",
+                                                    "productId": "1SDA066307R1",
+                                                    "type": "Detail"
+                                                }
+                                            }
+                                        ],
+                                        "Description": [
+                                            {
+                                                "text": "ADP MONT. FIXED TERM. x PF XT2 3p"
+                                            }
+                                        ],
+                                        "Type": [
+                                            {
+                                                "text": "ADP MONT. FIXED TERM. x PF XT2 3p"
+                                            }
+                                        ],
+                                        "Quantity": [
+                                            {
+                                                "text": "1"
+                                            }
+                                        ],
+                                        "UnitOfMeasure": [
+                                            {
+                                                "text": "piece"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "values": {
+                                        "Identifier": [
+                                            {
+                                                "text": "1SDA066869R1",
+                                                "link": {
+                                                    "text": "1SDA066869R1",
+                                                    "productId": "1SDA066869R1",
+                                                    "type": "Detail"
+                                                }
+                                            }
+                                        ],
+                                        "Description": [
+                                            {
+                                                "text": "KIT EF XT2 3pcs"
+                                            }
+                                        ],
+                                        "Type": [
+                                            {
+                                                "text": "KIT EF XT2 3pcs"
+                                            }
+                                        ],
+                                        "Quantity": [
+                                            {
+                                                "text": "1"
+                                            }
+                                        ],
+                                        "UnitOfMeasure": [
+                                            {
+                                                "text": "piece"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "values": {
+                                        "Identifier": [
+                                            {
+                                                "text": "1SDA066871R1",
+                                                "link": {
+                                                    "text": "1SDA066871R1",
+                                                    "productId": "1SDA066871R1",
+                                                    "type": "Detail"
+                                                }
+                                            }
+                                        ],
+                                        "Description": [
+                                            {
+                                                "text": "KIT EF XT2 6pcs"
+                                            }
+                                        ],
+                                        "Type": [
+                                            {
+                                                "text": "KIT EF XT2 6pcs"
+                                            }
+                                        ],
+                                        "Quantity": [
+                                            {
+                                                "text": "1"
+                                            }
+                                        ],
+                                        "UnitOfMeasure": [
+                                            {
+                                                "text": "piece"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "values": {
+                                        "Identifier": [
+                                            {
+                                                "text": "1SDA066262R1",
+                                                "link": {
+                                                    "text": "1SDA066262R1",
+                                                    "productId": "1SDA066262R1",
+                                                    "type": "Detail"
+                                                }
+                                            }
+                                        ],
+                                        "Description": [
+                                            {
+                                                "text": "KIT EF FP XT2 3pcs"
+                                            }
+                                        ],
+                                        "Type": [
+                                            {
+                                                "text": "KIT EF FP XT2 3pcs"
+                                            }
+                                        ],
+                                        "Quantity": [
+                                            {
+                                                "text": "1"
+                                            }
+                                        ],
+                                        "UnitOfMeasure": [
+                                            {
+                                                "text": "piece"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "values": {
+                                        "Identifier": [
+                                            {
+                                                "text": "1SDA066893R1",
+                                                "link": {
+                                                    "text": "1SDA066893R1",
+                                                    "productId": "1SDA066893R1",
+                                                    "type": "Detail"
+                                                }
+                                            }
+                                        ],
+                                        "Description": [
+                                            {
+                                                "text": "KIT ES XT2 3pcs"
+                                            }
+                                        ],
+                                        "Type": [
+                                            {
+                                                "text": "KIT ES XT2 3pcs"
+                                            }
+                                        ],
+                                        "Quantity": [
+                                            {
+                                                "text": "1"
+                                            }
+                                        ],
+                                        "UnitOfMeasure": [
+                                            {
+                                                "text": "piece"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "rowsTotalCount": 28
+                        },
+                        "filters": [
+                            {
+                                "attributeCode": "ConfigurationType",
+                                "attributeName": "Configuration Type",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "ConMinSta",
+                                "attributeName": "Conflict Minerals Status",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "DestoEhg",
+                                "attributeName": "DESTO EHG",
+                                "hitCount": 26,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "NumberOfPoles",
+                                "attributeName": "Number of Poles",
+                                "hitCount": 25,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "PackageLevel1Units",
+                                "attributeName": "Package Level 1 Units",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "ProductMainType",
+                                "attributeName": "Product Main Type",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "ProductName",
+                                "attributeName": "Product Name",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "ProductNetWeight",
+                                "attributeName": "Product Net Weight",
+                                "hitCount": 27,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "ProductType",
+                                "attributeName": "Product Type",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "Standards",
+                                "attributeName": "Standards",
+                                "hitCount": 28,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "SuitableFor",
+                                "attributeName": "Suitable For",
+                                "hitCount": 27,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "SuitableForClass",
+                                "attributeName": "Suitable for Product Class",
+                                "hitCount": 26,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            },
+                            {
+                                "attributeCode": "TerConTyp",
+                                "attributeName": "Terminal Connection Type",
+                                "hitCount": 15,
+                                "isPromoted": false,
+                                "promoted": false,
+                                "internal": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            "relatedLinks": {
+                "items": [
+                    {
+                        "text": "EPLAN DATA XT2N 160 TMA 80-800 3p F F",
+                        "url": "https://dataportal.eplan.com/parts/list?search=1SDA067017R1",
+                        "image": "https://www.eplan.es/typo3conf/ext/eplan_core/Resources/Public/Frontend/img/eplan-img-logo.svg",
+                        "internal": false
+                    },
+                    {
+                        "text": "2D & 3D Data XT2N 160 TMA 80-800 3p F F",
+                        "url": "https://abb-control-products.partcommunity.com?info=abb_ww%2Flow_voltage%2Fbreakers%2Fmodular20case20circuit20breakers20tmax20xt%2Fxt2_new.prj&varset=%7BPN%3D1SDA067017R1%7D",
+                        "image": "https://cdn.productimages.abb.com/9PAA00000154092_400x400.jpg",
+                        "internal": false
+                    }
+                ]
+            },
+            "productVariantsSelector": {},
+            "productVariantsTable": {}
+        },
+        "AppSettings": {
+            "treeType": "Products",
+            "appCode": "9AAG8556",
+            "langCode": "en",
+            "client": {
+                "ipAddress": "127.0.0.1",
+                "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+        },
+        "Printout": false,
+        "ApiUrl": "https://external.productinformation.abb.com/PisWebApi/v1/",
+        "RobotIndex": true
+    },
+    "CIDs": [
+        "9AAC167318"
+    ],
+    "Categories": [
+        "9AAC167318",
+        "9AAC167301",
+        "9AAC910006",
+        "9AAC167318"
+    ],
+    "DisplayName": "XT2N 160 TMA 80-800 3p F F",
+    "ShortName": "XT2N 160 TMA 80-800 3p F F",
+    "ProductURLSuffix": "XT2N 160 TMA 80-800 3p F F",
+    "MetaDescription": "C.BREAKER TMAX XT2N 160 FIXED THREE-POLE WITH FRONT TERMINALS AND THERMOMAGNETIC RELEASE TMA R 80 I3=400...800 A XT2N 160 TMA 80-800 3p F F",
+    "GlobalId": "1SDA067017R1"
+}
