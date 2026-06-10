@@ -4,3 +4,6 @@
 /scraper_package/scraper/brands/__pycache__
 /scraper/__pycache__
 /scraper/brands/__pycache__
+/scraper.egg-info
+scraped_outputs.xlsx
+*.csv

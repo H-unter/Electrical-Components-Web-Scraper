@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scraper"
+version = "0.1.0"
+description = "Product page scrapers for electrical component brands"
+requires-python = ">=3.10"
+dependencies = [
+    "beautifulsoup4",
+    "lxml",
+    "pandas",
+    "requests",
+]
+
+[project.scripts]
+scraper = "scraper.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scraper*"]
