@@ -211,48 +211,79 @@ class HagerScraper(BrandScraper):
             })
         return documents
     
-def map_hager_to_canonical(raw: dict|None) -> CanonicalMCCB|None:
+def map_hager_to_canonical(raw_dictionary: dict|None) -> CanonicalMCCB|None:
     """Transforms raw parsed Hager dictionary structures into a CanonicalMCCB instance."""
-    if not raw: return None  # Fast escape if raw data extraction was unsuccessful
-    gen, elec, dims = raw.get("General Information", {}), raw.get("Electric current", {}), raw.get("Dimensions", {})
+    if not raw_dictionary: return None  # Fast escape if raw data extraction was unsuccessful
 
-    def _num(val) -> float:
-        s = val[0] if isinstance(val, list) and val else val
-        return float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
+    general_info = raw_dictionary.get("General Information", {})  # Target general metadata blocks
+    electric_current = raw_dictionary.get("Electric current", {})  # Target power performance attributes
+    dimensions = raw_dictionary.get("Dimensions", {})  # Target layout sizing measurements
+    documents = raw_dictionary.get("Documents", {})  # Extract the nested documents block safely
 
-    ics_dict, icu_dict = {}, {}
-    for k, v in elec.items():
-        v_str = v[0] if isinstance(v, list) and v else v
-        v_cleaned = float(str(v_str).split()[0].replace(",", ".")) if v_str else 0.0
-        if "Ics under" in k:
-            m = re.search(r"under\s+(\d+\s*V\s*AC)", k)
-            if m: ics_dict[m.group(1).replace(" ", "")] = v_cleaned
-        elif "Icu under" in k:
-            m = re.search(r"under\s+(\d+\s*V\s*AC)", k)
-            if m: icu_dict[m.group(1).replace(" ", "")] = v_cleaned
+    def _num(value) -> float:
+        string_value = value[0] if isinstance(value, list) and value else value  # Clean array layers down to string
+        return float(re.sub(r"[^\d.]", "", str(string_value).replace(",", "."))) if string_value else 0.0  # Safe float cast
 
-    u_op_str = raw.get("Voltage", {}).get("Rated operational voltage Ue", "0")
-    u_op_str_clean = u_op_str[0] if isinstance(u_op_str, list) and u_op_str else u_op_str
-    u_op = _num(str(u_op_str_clean).split("-")[-1]) if "-" in str(u_op_str_clean) else _num(u_op_str_clean)
-    
-    freq_str = str(raw.get("Frequency", {}).get("Frequency", "50 - 60 Hz"))
-    freq = [float(x) for x in re.findall(r"\d+", freq_str)] if "-" in freq_str else _num(freq_str)
+    short_circuit_breaking_capacity = {}  # Allocate mapping block for service capacities
+    ultimate_short_circuit_breaking_capacity = {}  # Allocate mapping block for ultimate capacities
+    for key, value in electric_current.items():
+        string_value = value[0] if isinstance(value, list) and value else value  # Normalize lists down to single string element
+        cleaned_value = float(str(string_value).split()[0].replace(",", ".")) if string_value else 0.0  # Snatch leading float digits
+        if "Ics under" in key:  # Check pattern matches service criteria
+            match = re.search(r"under\s+(\d+\s*V\s*AC)", key)  # Isolate specific voltage string token
+            if match: short_circuit_breaking_capacity[match.group(1).replace(" ", "")] = cleaned_value  # Map voltage pair cleanly
+        elif "Icu under" in key:  # Check pattern matches ultimate criteria
+            match = re.search(r"under\s+(\d+\s*V\s*AC)", key)  # Isolate specific voltage string token
+            if match: ultimate_short_circuit_breaking_capacity[match.group(1).replace(" ", "")] = cleaned_value  # Map voltage pair cleanly
+
+    operational_voltage_string = raw_dictionary.get("Voltage", {}).get("Rated operational voltage Ue", "0")  # Extract baseline bounds
+    operational_voltage_clean = operational_voltage_string[0] if isinstance(operational_voltage_string, list) and operational_voltage_string else operational_voltage_string  # Extract list item string safely
+    operational_voltage = _num(str(operational_voltage_clean).split("-")[-1]) if "-" in str(operational_voltage_clean) else _num(operational_voltage_clean)  # Snatch the maximum range bound
+
+    frequency_string = str(raw_dictionary.get("Frequency", {}).get("Frequency", "50 - 60 Hz"))  # Safe string conversion cast
+    rated_frequency_hz = [float(extracted_number) for extracted_number in re.findall(r"\d+", frequency_string)] if "-" in frequency_string else _num(frequency_string)  # Capture frequency spans
+
+    datasheet_list = []  # Initialize core file document stack array
+    if isinstance(documents, dict): datasheet_list = documents.get("Product datasheet", []) or documents.get("Datasheet", [])  # Retrieve from direct subcategory keys
+    if not datasheet_list and isinstance(documents, dict):  # Fallback: scan through inner document categories
+        for key, value in documents.items():  # Loop keys looking for structural matches
+            if "datasheet" in key.lower() and isinstance(value, list):  # If name fits structure
+                datasheet_list = value  # Set target array layout
+                break  # Exit traversal loop
+    if not datasheet_list:  # Fallback: scan root keys directly
+        for key, value in raw_dictionary.items():  # Traverse root dictionary structure
+            if "datasheet" in key.lower() and isinstance(value, list):  # Check key pattern match criteria
+                datasheet_list = value  # Set target array layout
+                break  # Exit traversal loop
+    datasheet_url = datasheet_list[0].get("url") if isinstance(datasheet_list, list) and datasheet_list else None  # Grab first available PDF asset link
+
+    image_urls = []  # Allocate target listing placeholder array structure
+    images_raw_value = general_info.get("Images", "")  # Pull general image asset strings
+    if images_raw_value: image_urls = images_raw_value if isinstance(images_raw_value, list) else [images_raw_value]  # Push element natively or convert to single entry list
+    if not image_urls and isinstance(documents, dict) and "Product image" in documents:  # Fallback to secondary asset gallery arrays
+        product_images_documents = documents.get("Product image", [])  # Gather document lists
+        if isinstance(product_images_documents, list): image_urls = [item.get("url") for item in product_images_documents if item.get("url")]  # Compile image URLs cleanly
+
+    raw_impulse_voltage = _num(raw_dictionary.get("Voltage", {}).get("Rated impulse withstand voltage Uimp", "0"))  # Pull raw parameter metric
+    u_imp = raw_impulse_voltage / 1000.0 if raw_impulse_voltage > 100.0 else raw_impulse_voltage  # Standardize thousands value string boundary directly down to kV scale units
 
     return CanonicalMCCB(
-        sku=gen.get("SKU", ""),
+        sku=general_info.get("SKU", ""),
         brand="Hager",
-        display_name=gen.get("Display Name", ""),
-        poles=int(str(raw.get("Architecture", {}).get("Number of poles", "3"))),
-        rated_current_a=_num(elec.get("Rated current", "0")),
-        rated_frequency_hz=freq,
-        u_imp=_num(raw.get("Voltage", {}).get("Rated impulse withstand voltage Uimp", "0")) / 1000.0,
-        u_insulation=_num(raw.get("Voltage", {}).get("Rated insulation voltage Ui", "0")),
-        u_operational=u_op,
-        trip_type=raw.get("Functions", {}).get("Trip unit", "TM"),
-        voltage_to_short_circuit_breaking_capacity_ka=ics_dict,
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
-        height_mm=_num(dims.get("Height", "0")),
-        width_mm=_num(dims.get("Width", "0")),
-        depth_mm=_num(dims.get("Depth", "0")),
-        weight_kg=None
+        display_name=general_info.get("Display Name", ""),
+        poles=int(str(raw_dictionary.get("Architecture", {}).get("Number of poles", "3"))),
+        rated_current_a=_num(electric_current.get("Rated current", "0")),
+        rated_frequency_hz=rated_frequency_hz,
+        u_imp=u_imp,
+        u_insulation=_num(raw_dictionary.get("Voltage", {}).get("Rated insulation voltage Ui", "0")),
+        u_operational=operational_voltage,
+        trip_type=raw_dictionary.get("Functions", {}).get("Trip unit", "TM"),
+        voltage_to_short_circuit_breaking_capacity_ka=short_circuit_breaking_capacity,
+        voltage_to_ultimate_short_circuit_breaking_capacity_ka=ultimate_short_circuit_breaking_capacity,
+        height_mm=_num(dimensions.get("Height", "0")),
+        width_mm=_num(dimensions.get("Width", "0")),
+        depth_mm=_num(dimensions.get("Depth", "0")),
+        weight_kg=None,
+        datasheet_url=datasheet_url,
+        image_urls=image_urls
     )

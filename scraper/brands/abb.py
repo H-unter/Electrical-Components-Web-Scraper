@@ -89,13 +89,9 @@ class AbbScraper(BrandScraper):
     
 def map_abb_to_canonical(raw: dict|None) -> CanonicalMCCB|None:
     """Transforms raw parsed ABB dictionary structures into a CanonicalMCCB instance."""
-    if not raw:
-        return None
-    gen, tech, dims = (
-        raw.get("General Information", {}),
-        raw.get("Technical", {}),
-        raw.get("Dimensions", {}),
-    )  # Extract base sections
+    if not raw: return None
+    gen, tech, dims = raw.get("General Information", {}), raw.get("Technical", {}), raw.get("Dimensions", {})
+    certs = raw.get("Certificates and Declarations", {}) # Extract certificates section
 
     def _num(val) -> float:
         s = val[0] if isinstance(val, list) and val else val
@@ -139,11 +135,15 @@ def map_abb_to_canonical(raw: dict|None) -> CanonicalMCCB|None:
         if "V AC" in str(u_op_clean)
         else _num(u_op_clean)
     )
+    doc_list = certs.get("Data Sheet, Technical Information", [])
+    doc_id = doc_list[0] if isinstance(doc_list, list) and doc_list else None
 
     return CanonicalMCCB(
         sku=gen.get("Global ID", ""),
         brand="ABB",
         display_name=gen.get("Display Name", ""),
+        datasheet_url=f"https://search.abb.com/library/Download.aspx?DocumentID={doc_id}&LanguageCode=en&DocumentPartId=&Action=Launch" if doc_id else None,
+        image_urls=gen.get("Images", []) if isinstance(gen.get("Images"), list) else [],
         poles=int(
             str(_find_val(tech, "Number of Poles") or "3").replace("P", "")
         ),
