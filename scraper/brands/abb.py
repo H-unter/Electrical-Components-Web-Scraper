@@ -87,43 +87,80 @@ class AbbScraper(BrandScraper):
 
         return result
     
-
-def map_abb_to_canonical(raw: dict|None) -> CanonicalMCCB | None:
+def map_abb_to_canonical(raw: dict|None) -> CanonicalMCCB|None:
     """Transforms raw parsed ABB dictionary structures into a CanonicalMCCB instance."""
-    if not raw: return None
-    gen, tech, dims = raw.get("General Information", {}), raw.get("Technical", {}), raw.get("Dimensions", {})
+    if not raw:
+        return None
+    gen, tech, dims = (
+        raw.get("General Information", {}),
+        raw.get("Technical", {}),
+        raw.get("Dimensions", {}),
+    )  # Extract base sections
 
     def _num(val) -> float:
         s = val[0] if isinstance(val, list) and val else val
-        return float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
+        return (
+            float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
+        )
 
-    def _parse_capacity(raw_str) -> dict[str, float]:
-        lines = raw_str if isinstance(raw_str, list) else [raw_str] if raw_str else []
-        pairs = [re.search(r"\((.*?)\)\s*([\d.]+)", str(line)) for line in lines if "(" in str(line)]
-        return {m.group(1).replace(" ", ""): float(m.group(2)) for m in pairs if m}
+    # 1. Helper function to find a value by evaluating text patterns inside the keys dynamically
+    def _find_val(d: dict, pattern: str):
+        return next((v for k, v in d.items() if pattern in k), None)
+
+    # 2. Helper function to isolate voltage levels and numeric capacities from array lists safely
+    def _parse_capacity(raw_val) -> dict[str, float]:
+        lines = (
+            raw_val
+            if isinstance(raw_val, list)
+            else [raw_val]
+            if raw_val
+            else []
+        )
+        pairs = [
+            re.search(r"\((.*?)\)\s*([\d.]+)", str(line))
+            for line in lines
+            if "(" in str(line)
+        ]
+        return {
+            m.group(1).replace(" ", ""): float(m.group(2)) for m in pairs if m
+        }
 
     freq_str = tech.get("Rated Frequency (f)", "50 / 60 Hz")
-    freq = [float(x) for x in re.findall(r"\d+", str(freq_str))] if "/" in str(freq_str) or "-" in str(freq_str) else _num(freq_str)
-    
-    u_op_str = tech.get("Rated Operational Voltage", "")
-    u_op_str_clean = u_op_str[0] if isinstance(u_op_str, list) and u_op_str else u_op_str
-    u_op = _num(str(u_op_str_clean).split("V AC")[0]) if "V AC" in str(u_op_str_clean) else _num(u_op_str_clean)
+    freq = (
+        [float(x) for x in re.findall(r"\d+", str(freq_str))]
+        if "/" in str(freq_str) or "-" in str(freq_str)
+        else _num(freq_str)
+    )
+
+    u_op_str = _find_val(tech, "Rated Operational Voltage") or ""
+    u_op_clean = u_op_str[0] if isinstance(u_op_str, list) and u_op_str else u_op_str
+    u_op = (
+        _num(str(u_op_clean).split("V AC")[0])
+        if "V AC" in str(u_op_clean)
+        else _num(u_op_clean)
+    )
 
     return CanonicalMCCB(
         sku=gen.get("Global ID", ""),
         brand="ABB",
         display_name=gen.get("Display Name", ""),
-        poles=int(str(tech.get("Number of Poles", "3")).replace("P", "")),
-        rated_current_a=_num(tech.get("Rated Current (I_n)", "0")),  # Stripped HTML tags
+        poles=int(
+            str(_find_val(tech, "Number of Poles") or "3").replace("P", "")
+        ),
+        rated_current_a=_num(_find_val(tech, "Rated Current")),
         rated_frequency_hz=freq,
-        u_imp=_num(tech.get("Rated Impulse Withstand Voltage (U_imp)", "0")),  # Stripped HTML tags
-        u_insulation=_num(tech.get("Rated Insulation Voltage (U_i)", "0")),  # Stripped HTML tags
+        u_imp=_num(_find_val(tech, "Rated Impulse Withstand")),
+        u_insulation=_num(_find_val(tech, "Rated Insulation Voltage")),
         u_operational=u_op,
         trip_type=tech.get("Release Type", "TM"),
-        voltage_to_short_circuit_breaking_capacity_ka=_parse_capacity(tech.get("Rated Service Short-Circuit Breaking Capacity (I_cs)", "")),  # Stripped HTML tags
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=_parse_capacity(tech.get("Rated Ultimate Short-Circuit Breaking Capacity (I_cu)", "")),  # Stripped HTML tags
+        voltage_to_short_circuit_breaking_capacity_ka=_parse_capacity(
+            _find_val(tech, "Rated Service Short-Circuit")
+        ),
+        voltage_to_ultimate_short_circuit_breaking_capacity_ka=_parse_capacity(
+            _find_val(tech, "Rated Ultimate Short-Circuit")
+        ),
         height_mm=_num(dims.get("Product Net Height", "0")),
         width_mm=_num(dims.get("Product Net Width", "0")),
         depth_mm=_num(dims.get("Product Net Depth / Length", "0")),
-        weight_kg=_num(dims.get("Product Net Weight", "0")) or None
+        weight_kg=_num(dims.get("Product Net Weight", "0")) or None,
     )
