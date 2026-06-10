@@ -7,3 +7,4 @@
 /scraper.egg-info
 scraped_outputs.xlsx
 *.csv
+*.json

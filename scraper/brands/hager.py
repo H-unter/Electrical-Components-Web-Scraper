@@ -5,8 +5,9 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from ..base import BrandScraper
+from ..BrandScraper import BrandScraper
 from ..utils import clean_text
+from ..CanonicalMCCB import CanonicalMCCB
 
 
 class HagerScraper(BrandScraper):
@@ -16,7 +17,7 @@ class HagerScraper(BrandScraper):
     The first region that contains the SKU is used.
     """
 
-    FALLBACK_REGIONS = ["au", "sg", "uk", "de", "fr"]
+    FALLBACK_REGIONS = ["au", "uk", "nz"]
     HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 
     # ------------------------------------------------------------------
@@ -209,3 +210,49 @@ class HagerScraper(BrandScraper):
                 "file_size":   clean_text(size_el.text)  if size_el  else "",
             })
         return documents
+    
+def map_hager_to_canonical(raw: dict|None) -> CanonicalMCCB|None:
+    """Transforms raw parsed Hager dictionary structures into a CanonicalMCCB instance."""
+    if not raw: return None  # Fast escape if raw data extraction was unsuccessful
+    gen, elec, dims = raw.get("General Information", {}), raw.get("Electric current", {}), raw.get("Dimensions", {})
+
+    def _num(val) -> float:
+        s = val[0] if isinstance(val, list) and val else val
+        return float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
+
+    ics_dict, icu_dict = {}, {}
+    for k, v in elec.items():
+        v_str = v[0] if isinstance(v, list) and v else v
+        v_cleaned = float(str(v_str).split()[0].replace(",", ".")) if v_str else 0.0
+        if "Ics under" in k:
+            m = re.search(r"under\s+(\d+\s*V\s*AC)", k)
+            if m: ics_dict[m.group(1).replace(" ", "")] = v_cleaned
+        elif "Icu under" in k:
+            m = re.search(r"under\s+(\d+\s*V\s*AC)", k)
+            if m: icu_dict[m.group(1).replace(" ", "")] = v_cleaned
+
+    u_op_str = raw.get("Voltage", {}).get("Rated operational voltage Ue", "0")
+    u_op_str_clean = u_op_str[0] if isinstance(u_op_str, list) and u_op_str else u_op_str
+    u_op = _num(str(u_op_str_clean).split("-")[-1]) if "-" in str(u_op_str_clean) else _num(u_op_str_clean)
+    
+    freq_str = str(raw.get("Frequency", {}).get("Frequency", "50 - 60 Hz"))
+    freq = [float(x) for x in re.findall(r"\d+", freq_str)] if "-" in freq_str else _num(freq_str)
+
+    return CanonicalMCCB(
+        sku=gen.get("SKU", ""),
+        brand="Hager",
+        display_name=gen.get("Display Name", ""),
+        poles=int(str(raw.get("Architecture", {}).get("Number of poles", "3"))),
+        rated_current_a=_num(elec.get("Rated current", "0")),
+        rated_frequency_hz=freq,
+        u_imp=_num(raw.get("Voltage", {}).get("Rated impulse withstand voltage Uimp", "0")) / 1000.0,
+        u_insulation=_num(raw.get("Voltage", {}).get("Rated insulation voltage Ui", "0")),
+        u_operational=u_op,
+        trip_type=raw.get("Functions", {}).get("Trip unit", "TM"),
+        voltage_to_short_circuit_breaking_capacity_ka=ics_dict,
+        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
+        height_mm=_num(dims.get("Height", "0")),
+        width_mm=_num(dims.get("Width", "0")),
+        depth_mm=_num(dims.get("Depth", "0")),
+        weight_kg=None
+    )
