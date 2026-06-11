@@ -1,5 +1,5 @@
 from scraper import HagerScraper, AbbScraper
-from scraper.brands.abb import map_abb_to_canonical
+from scraper.brands.abb import map_abb_to_canonical_mccb, map_abb_to_canonical_contactor
 from scraper.brands.hager import map_hager_to_canonical
 from scraper.utils import write_json
 
@@ -31,20 +31,17 @@ hager_mccbs_of_interest = [
 ]
 
 def main():
-
-   for product in abb_contactors_of_interest:
-
-      raw_dictionary = AbbScraper().scrape_to_dictionary(product, export_json=True, export_path=f"./output/abb_contactor_{product}_raw.json")
+   # for product in abb_contactors_of_interest:
+   #    print(f"Processing ABB contactor: {product}")
+   #    raw_dictionary = AbbScraper().scrape_to_dictionary(product, export_json=False, export_path=f"./output/abb_contactor_{product}_raw.json")
+   #    canonical_contactor = map_abb_to_canonical_contactor(raw_dictionary)
+   #    write_json(canonical_contactor.to_dict(), f"./output/abb_contactor_{product}_canonical.json")
       
-      # mccb = map_abb_to_canonical(raw_dictionary)
-      # if mccb:
-      #    write_json(mccb.to_dict(), f"./output/abb_{product}_canonical.json")
    for product in hager_contactors_of_interest:
-
+      print(f"Processing Hager contactor: {product}")
       raw_dictionary = HagerScraper().scrape_to_dictionary(product, export_json=True, export_path=f"./output/hager_contactor_{product}_raw.json")
-      # mccb = map_hager_to_canonical(raw_dictionary)
-      # if mccb:
-      #    write_json(mccb.to_dict(), f"./output/hager_{product}_canonical.json")
+      # canonical_contactor = map_hager_to_canonical_contactor(raw_dictionary, product_type="contactor")
+      # write_json(canonical_contactor.to_dict(), f"./output/hager_contactor_{product}_canonical.json")
 
 if __name__ == "__main__":
     main()
