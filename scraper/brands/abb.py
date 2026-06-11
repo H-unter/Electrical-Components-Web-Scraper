@@ -20,6 +20,12 @@ class AbbScraper(BrandScraper):
     def get_soup(self, sku: str) -> BeautifulSoup | None:
         """Fetches the ABB product page for a given SKU."""
         url = f"{self.BASE_URL}/{sku.upper().strip()}"
+        soup = get_html_soup(url)
+        if not soup:
+            url = f"{self.BASE_URL}/{sku.lower().strip()}"
+            soup = get_html_soup(url)
+        return soup if soup else None
+
         return get_html_soup(url)
 
     def extract_product_info(self, soup: BeautifulSoup) -> dict:
