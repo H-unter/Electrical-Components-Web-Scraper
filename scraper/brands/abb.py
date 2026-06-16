@@ -6,10 +6,12 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from typing import Optional
 
 from ..BrandScraper import BrandScraper
 from ..utils import get_html_soup
 from ..CanonicalMCCB import CanonicalMCCB
+from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 
 
@@ -532,4 +534,159 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
         width_mm=_num(dims.get("Product Net Width", "0")),
         depth_mm=_num(dims.get("Product Net Depth / Length", "0")),
         weight_kg=_num(dims.get("Product Net Weight", "0")) or None,
+    )
+
+def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None:
+    """Transforms raw parsed ABB product JSON into a CanonicalMCB instance."""
+    if not raw_dictionary:
+        return None
+
+    # ABB data can either be nested inside a 'ProductViewModel' or already flattened into categories.
+    attr_map = {}
+    pvm = raw_dictionary.get("ProductViewModel", {})
+    groups = pvm.get("Groups", []) if pvm else raw_dictionary.get("Groups", [])
+
+    if not groups:
+        # If the data was already scraped and grouped by AbbScraper.extract_product_info
+        for category, attrs in raw_dictionary.items():
+            if isinstance(attrs, dict):
+                for k, v in attrs.items():
+                    clean_k = re.sub(r'<[^>]+>', '', k).strip() # Strip HTML like <sub>n</sub>
+                    attr_map[clean_k] = v
+    else:
+        # If raw JSON from the ViewModel API
+        for group in groups:
+            for attr in group.get("Attributes", []):
+                name = attr.get("Name", "")
+                value = attr.get("Value", "")
+                clean_name = re.sub(r'<[^>]+>', '', name).strip()
+                attr_map[clean_name] = value
+
+    # --- Helpers ---
+    def _extract_string(key: str) -> str:
+        # Looks for exact matches first, then falls back to partial matches
+        if key in attr_map:
+            return str(attr_map[key])
+        for k, v in attr_map.items():
+            if key.lower() in k.lower():
+                return str(v)
+        return ""
+
+    def _float(val: str) -> float:
+        if not val: return 0.0
+        cleaned = re.search(r"([\d.,]+)", val)
+        if cleaned:
+            return float(cleaned.group(1).replace(",", "."))
+        return 0.0
+
+    def _int(val: str) -> int:
+        if not val: return 0
+        cleaned = re.search(r"(\d+)", val)
+        return int(cleaned.group(1)) if cleaned else 0
+
+    def _parse_capacity(val: str) -> dict[str, float]:
+        """Parses strings like '(230 V AC) 10 kA' or '["(AC) 6 kA", "(400 V AC) 6 kA"]' into a dict."""
+        caps = {}
+        if not val: return caps
+        
+        matches = re.finditer(r"\((.*?)\)\s*([\d.,]+)\s*kA", val)
+        found_specific_voltage = False
+        generic_caps = {}
+        
+        for m in matches:
+            voltage_str = m.group(1).strip()
+            ka_val = float(m.group(2).replace(',', '.'))
+            
+            # Check if the parenthesis actually contains numbers (e.g., "400 V AC")
+            if any(char.isdigit() for char in voltage_str):
+                caps[voltage_str] = ka_val
+                found_specific_voltage = True
+            else:
+                # Store non-voltage qualifiers (like "AC" or "DC") temporarily
+                generic_caps[f"Default {voltage_str}"] = ka_val
+                
+        # If specific voltages were found, ignore the generics to keep the keys clean.
+        # If NO specific voltages were found, append the generic ones (e.g., "Default AC")
+        if not found_specific_voltage and generic_caps:
+            caps.update(generic_caps)
+            
+        # Fallback if no parenthesis format was used at all (e.g., just "10 kA")
+        if not caps and not generic_caps:
+            fallback = re.search(r"([\d.,]+)\s*kA", val)
+            if fallback:
+                caps["Default"] = float(fallback.group(1).replace(',', '.'))
+                
+        return caps
+
+    def _parse_frequency(val: str) -> Optional[float | list[float]]:
+        if not val: return None
+        matches = re.findall(r"([\d.,]+)", val)
+        floats = [float(m.replace(',', '.')) for m in matches]
+        if not floats: return None
+        return floats[0] if len(floats) == 1 else floats
+
+    # --- Core Properties ---
+    display_name = raw_dictionary.get("DisplayName") or attr_map.get("Display Name", attr_map.get("Product ID", ""))
+    sku = attr_map.get("Global ID", attr_map.get("Order Code", attr_map.get("Product ID", display_name)))
+    
+    # --- Images ---
+    image_urls = []
+    if pvm and "Images" in pvm:
+        for img in pvm["Images"]:
+            url = img.get("PublicUrl") or img.get("Url", "")
+            if url:
+                if url.startswith("//"): url = "https:" + url
+                image_urls.append(url)
+    else:
+        images_val = attr_map.get("Images", [])
+        if isinstance(images_val, list):
+            for img in images_val:
+                url = img if isinstance(img, str) else img.get("PublicUrl", img.get("Url", ""))
+                if url:
+                    if url.startswith("//"): url = "https:" + url
+                    image_urls.append(url)
+
+    # --- Documents ---
+    doc_id = attr_map.get("Data Sheet, Technical Information")
+    if doc_id:
+        datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={doc_id}&LanguageCode=en&DocumentPartId=&Action=Launch"
+    else:
+        product_id = attr_map.get("Product ID", sku)
+        datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={product_id}&LanguageCode=en&DocumentPartId=&Action=Launch" if product_id else None
+
+    # --- Capacities (with Ics -> Icn fallback) ---
+    ics_str = _extract_string("Rated Service Short-Circuit Breaking Capacity")
+    icn_str = _extract_string("Rated Short-Circuit Capacity")
+    icu_str = _extract_string("Rated Ultimate Short-Circuit Breaking Capacity")
+
+    # Parse Ics first. If the dictionary is empty (meaning no Ics data exists), parse Icn instead.
+    ics_dict = _parse_capacity(ics_str)
+    if not ics_dict:
+        ics_dict = _parse_capacity(icn_str)
+        
+    icu_dict = _parse_capacity(icu_str)
+
+    # --- Weight Handling (Convert grams to kg if necessary) ---
+    weight_str = _extract_string("Product Net Weight")
+    weight_kg = _float(weight_str)
+    if weight_kg and "g" in weight_str.lower() and "kg" not in weight_str.lower():
+        weight_kg = weight_kg / 1000.0
+
+    return CanonicalMCB(
+        sku=sku,
+        brand="ABB",
+        display_name=display_name,
+        poles=_int(_extract_string("Number of Poles")),
+        protected_poles=_int(_extract_string("Number of Protected Poles")),
+        rated_current_a=_float(_extract_string("Rated Current (In)")),
+        tripping_characteristic=_extract_string("Tripping Characteristic"),
+        voltage_to_service_short_circuit_breaking_capacity_ka=ics_dict,
+        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
+        height_mm=_float(_extract_string("Product Net Height")),
+        width_mm=_float(_extract_string("Product Net Width")),
+        depth_mm=_float(_extract_string("Product Net Depth")),
+        datasheet_url=datasheet_url,
+        image_urls=image_urls if image_urls else None,
+        rated_frequency_hz=_parse_frequency(_extract_string("Rated Frequency (f)")),
+        weight_kg=weight_kg if weight_kg else None
     )
