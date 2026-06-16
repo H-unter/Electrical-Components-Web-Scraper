@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from ..BrandScraper import BrandScraper
 from ..utils import clean_text
 from ..CanonicalMCCB import CanonicalMCCB
+from ..CanonicalContactor import CanonicalContactor
 
 
 class HagerScraper(BrandScraper):
@@ -82,26 +83,32 @@ class HagerScraper(BrandScraper):
     # ------------------------------------------------------------------
 
     def _find_product_url(self, sku: str) -> str | None:
-        """Iterates regional sitemaps in FALLBACK_REGIONS order, returning the
-        first URL that matches the SKU, or None if not found in any region."""
         sku = sku.upper().strip()
-        for region in self.FALLBACK_REGIONS:
-            url = f"https://hager.com/{region}/products/media/sitemap_{region}.xml"
+        
+        sitemaps = [
+            (region, f"https://hager.com/{region}/products/media/sitemap_{region}.xml")
+            for region in self.FALLBACK_REGIONS
+        ]
+        sitemaps.append(("intl-en", "https://hager.com/intl-en/catalogue/media/sitemap_intl_en.xml"))
+
+        for region, url in sitemaps:
             try:
                 res = requests.get(url, headers=self.HEADERS, timeout=15)
                 res.raise_for_status()
                 soup = BeautifulSoup(res.text, "xml")
+                
                 for loc in soup.find_all("loc"):
                     slug = loc.text.split("/")[-1]
                     match = re.match(r"^([a-z0-9]+)-", slug)
                     if match and match.group(1).upper() == sku:
                         print(f"Found '{sku}' in region '{region}': {loc.text}")
                         return loc.text
+                        
                 print(f"'{sku}' not in region '{region}', trying next...")
             except Exception as e:
                 print(f"Sitemap fetch failed for region '{region}': {e}")
 
-        print(f"'{sku}' not found in any region: {self.FALLBACK_REGIONS}")
+        print(f"'{sku}' not found in any region.")
         return None
 
     # ------------------------------------------------------------------
@@ -211,7 +218,7 @@ class HagerScraper(BrandScraper):
             })
         return documents
     
-def map_hager_to_canonical(raw_dictionary: dict|None) -> CanonicalMCCB|None:
+def map_hager_to_canonical_mccb(raw_dictionary: dict|None) -> CanonicalMCCB|None:
     """Transforms raw parsed Hager dictionary structures into a CanonicalMCCB instance."""
     if not raw_dictionary: return None  # Fast escape if raw data extraction was unsuccessful
 
@@ -286,4 +293,96 @@ def map_hager_to_canonical(raw_dictionary: dict|None) -> CanonicalMCCB|None:
         weight_kg=None,
         datasheet_url=datasheet_url,
         image_urls=image_urls
+    )
+
+def map_hager_to_canonical_contactor(raw_dictionary: dict | None) -> CanonicalContactor | None:
+    """Transforms raw parsed Hager contactor dictionary structures into a CanonicalContactor instance."""
+    if not raw_dictionary:
+        return None
+
+    general_info = raw_dictionary.get("General Information", {})
+    electric_current = raw_dictionary.get("Electric current", {})
+    voltage = raw_dictionary.get("Voltage", {})
+    dimensions = raw_dictionary.get("Dimensions", {})
+    equipment = raw_dictionary.get("Equipment", {})
+    connection = raw_dictionary.get("Connection", {})
+    architecture = raw_dictionary.get("Architecture", {})
+    documents = raw_dictionary.get("Documents", {})
+
+    # --- Helpers ---
+    def _extract_string(value) -> str:
+        return str(value[0] if isinstance(value, list) and value else value)
+
+    def _num(value) -> float:
+        string_value = _extract_string(value)
+        if not string_value or string_value.lower() == 'none':
+            return 0.0
+        cleaned = re.sub(r"[^\d.]", "", string_value.replace(",", "."))
+        return float(cleaned) if cleaned else 0.0
+
+    def _int(value) -> int:
+        string_value = _extract_string(value)
+        match = re.search(r"(\d+)", string_value)
+        return int(match.group(1)) if match else 0
+
+    # --- Contacts Processing ---
+    no_contacts = _int(equipment.get("Number of NO contacts", "0"))
+    nc_contacts = _int(equipment.get("Number of NC contacts", "0"))
+
+    if no_contacts == 0 and nc_contacts == 0:
+        contact_type = _extract_string(connection.get("Type of contacts", ""))
+        no_match = re.search(r"(\d+)\s*NO", contact_type)
+        nc_match = re.search(r"(\d+)\s*NC", contact_type)
+        if no_match: no_contacts = int(no_match.group(1))
+        if nc_match: nc_contacts = int(nc_match.group(1))
+
+    # --- Poles Processing (Strict Read) ---
+    poles_str = _extract_string(architecture.get("Number of poles", ""))
+    poles = _int(poles_str) if poles_str else None
+
+    # --- Voltages Processing ---
+    ue_str = _extract_string(voltage.get("Rated operational voltage Ue", "0"))
+    ue_matches = re.findall(r"(\d+)", ue_str)
+    operational_voltage = int(ue_matches[-1]) if ue_matches else 0
+
+    insulation_voltage = _int(voltage.get("Rated insulation voltage Ui", "0"))
+    impulse_withstand_voltage = _int(voltage.get("Rated impulse withstand voltage Uimp", "0"))
+
+    # --- Current Processing ---
+    rated_current = _num(electric_current.get("Rated current", "0"))
+    
+    ac1_currents = {}
+    if operational_voltage > 0 and rated_current > 0:
+        ac1_currents[f"{operational_voltage}V"] = rated_current
+
+    # --- Documents & Images ---
+    datasheet_list = documents.get("Product datasheet", []) or documents.get("Product data sheet", [])
+    datasheet_url = datasheet_list[0].get("url") if isinstance(datasheet_list, list) and datasheet_list else None
+
+    images_raw_value = general_info.get("Images", "")
+    if images_raw_value:
+        image_urls = images_raw_value if isinstance(images_raw_value, list) else [images_raw_value]
+    else:
+        product_images_documents = documents.get("Product image", [])
+        image_urls = [item.get("url") for item in product_images_documents if isinstance(item, dict) and item.get("url")]
+
+    return CanonicalContactor(
+        sku=general_info.get("SKU", general_info.get("Display Name", "")),
+        brand="Hager",
+        display_name=general_info.get("Display Name", ""),
+        datasheet_url=datasheet_url,
+        image_urls=image_urls,
+        poles=poles,
+        normally_open_contacts=no_contacts,
+        normally_closed_contacts=nc_contacts,
+        rated_current_a=rated_current if rated_current > 0 else None,
+        voltage_to_rated_ac1_current_a=ac1_currents,
+        voltage_to_rated_ac3_current_a={},
+        operational_voltage_v=operational_voltage,
+        insulation_voltage_v=insulation_voltage,
+        impulse_withstand_voltage_v=impulse_withstand_voltage,
+        height_mm=_num(dimensions.get("Height", "0")),
+        width_mm=_num(dimensions.get("Width", "0")),
+        depth_mm=_num(dimensions.get("Depth", "0")),
+        weight_kg=None
     )
