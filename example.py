@@ -1,6 +1,6 @@
 from scraper import HagerScraper, AbbScraper
 from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor
-from scraper.brands.hager import map_hager_to_canonical_mccb, map_hager_to_canonical_contactor
+from scraper.brands.hager import map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor
 from scraper.utils import write_json
 
 abb_mccbs_of_interest = [
@@ -34,21 +34,23 @@ hager_mccbs_of_interest = [ # sometimes really annoying due to their sitemap mis
       'HHS160DR'
 ]
 hager_mcbs_of_interest = [
-   'HMC199T', # https://hager.com/au/products/product-information/hmc199t-mcb-1p-15ka-c-125a-1-5m
+   'https://hager.com/au/products/product-information/hmc199t-mcb-1p-15ka-c-125a-1-5m', # https://hager.com/au/products/product-information/hmc199t-mcb-1p-15ka-c-125a-1-5m
+   'https://hager.com/au/products/product-information/msn250-mcb-2p-6ka-c-50a-2m',
+   'https://hager.com/au/products/product-information/hmc280t-mcb-2p-15ka-c-80a-3m'
 ]
 def main():
-   for i, product in enumerate(abb_mcbs_of_interest):
-      print(f"Processing ABB MCB: {product}")
-      raw_dictionary = AbbScraper().scrape_to_dictionary(url=product, export_json=False, export_path=f"./output/abb_mcb_{i}_raw.json")
-      canonical_mcb = map_abb_to_canonical_mcb(raw_dictionary)
-      write_json(raw_dictionary, f"./output/abb_mcb_{i}_raw.json")
-      write_json(canonical_mcb.to_dict(), f"./output/abb_mcb_{i}_canonical.json")
+   # for i, product in enumerate(abb_mcbs_of_interest):
+   #    print(f"Processing ABB MCB: {product}")
+   #    raw_dictionary = AbbScraper().scrape_to_dictionary(url=product, export_json=False, export_path=f"./output/abb_mcb_{i}_raw.json")
+   #    canonical_mcb = map_abb_to_canonical_mcb(raw_dictionary)
+   #    write_json(raw_dictionary, f"./output/abb_mcb_{i}_raw.json")
+   #    write_json(canonical_mcb.to_dict(), f"./output/abb_mcb_{i}_canonical.json")
 
-   # for i, product in enumerate(hager_contactors_of_interest):
-   #    print(f"Processing Hager contactor: {product}")
-   #    raw_dictionary = HagerScraper().scrape_to_dictionary(url=product, export_json=True, export_path=f"./output/hager_contactor_{i}_raw.json")
-   #    canonical_contactor = map_hager_to_canonical_contactor(raw_dictionary)
-   #    write_json(canonical_contactor.to_dict(), f"./output/hager_contactor_{i}_canonical.json")
+   for i, product in enumerate(hager_mcbs_of_interest):
+      print(f"Processing Hager MCB: {product}")
+      raw_dictionary = HagerScraper().scrape_to_dictionary(url=product, export_json=True, export_path=f"./output/hager_mcb_{i}_raw.json")
+      canonical_mcb = map_hager_to_canonical_mcb(raw_dictionary)
+      write_json(canonical_mcb.to_dict(), f"./output/hager_mcb_{i}_canonical.json")
 
 if __name__ == "__main__":
     main()

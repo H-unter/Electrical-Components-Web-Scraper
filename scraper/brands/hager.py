@@ -4,10 +4,12 @@ import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from typing import Optional
 
 from ..BrandScraper import BrandScraper
 from ..utils import clean_text
 from ..CanonicalMCCB import CanonicalMCCB
+from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 
 
@@ -384,5 +386,129 @@ def map_hager_to_canonical_contactor(raw_dictionary: dict | None) -> CanonicalCo
         height_mm=_num(dimensions.get("Height", "0")),
         width_mm=_num(dimensions.get("Width", "0")),
         depth_mm=_num(dimensions.get("Depth", "0")),
+        weight_kg=None
+    )
+
+def map_hager_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None:
+    """Transforms raw parsed Hager MCB dictionary structures into a CanonicalMCB instance."""
+    if not raw_dictionary:
+        return None
+
+    general_info = raw_dictionary.get("General Information", {})
+    electric_current = raw_dictionary.get("Electric current", {})
+    architecture = raw_dictionary.get("Architecture", {})
+    main_elec = raw_dictionary.get("Main electrical attributes", {})
+    dimensions = raw_dictionary.get("Dimensions", {})
+    frequency = raw_dictionary.get("Frequency", {})
+    documents = raw_dictionary.get("Documents", {})
+
+    # --- Helpers ---
+    def _extract_string(value) -> str:
+        return str(value[0] if isinstance(value, list) and value else value)
+
+    def _num(value) -> float:
+        string_value = _extract_string(value)
+        if not string_value or string_value.lower() == 'none':
+            return 0.0
+        # Replace European commas with dots and strip non-numerics
+        cleaned = re.sub(r"[^\d.,]", "", string_value.replace(",", "."))
+        try:
+            match = re.search(r"([\d.]+)", cleaned)
+            return float(match.group(1)) if match else 0.0
+        except ValueError:
+            return 0.0
+
+    def _int(value) -> int:
+        string_value = _extract_string(value)
+        match = re.search(r"(\d+)", string_value)
+        return int(match.group(1)) if match else 0
+
+    def _parse_capacity(target_type: str) -> dict[str, float]:
+        """
+        Searches keys for 'Icn' or 'Icu' and dynamically extracts 
+        the voltage rating from the key string (e.g., 'under 400 V AC').
+        """
+        caps = {}
+        # Hager distributes these capacities across two different dictionaries
+        sources = {**main_elec, **electric_current}
+        
+        for key, value in sources.items():
+            if target_type.lower() in key.lower():
+                ka_val = _num(value)
+                if ka_val > 0:
+                    # Extract the voltage mentioned in the text key
+                    volt_match = re.search(r"(\d+\s*V\s*(?:AC|DC)?)", key, re.IGNORECASE)
+                    if volt_match:
+                        # Clean up formatting, e.g., "400 V AC"
+                        caps[volt_match.group(1).upper()] = ka_val
+                    else:
+                        caps["Default"] = ka_val
+        return caps
+
+    def _parse_frequency(val: str) -> Optional[float | list[float]]:
+        if not val: return None
+        string_value = _extract_string(val)
+        matches = re.findall(r"(\d+)", string_value)
+        if not matches: return None
+        floats = [float(m) for m in matches]
+        return floats[0] if len(floats) == 1 else floats
+
+    # --- Core Properties ---
+    display_name = general_info.get("Display Name", "")
+    sku = general_info.get("SKU", display_name)
+    
+    poles_str = _extract_string(architecture.get("Type of pole", ""))
+    poles = _int(poles_str)
+    
+    # Infer protected poles: Assume all are protected unless a neutral is specified
+    protected_poles = poles if poles > 0 else 0
+    if "N" in poles_str.upper() and poles > 1:
+        protected_poles = poles - 1
+
+    rated_current = _num(electric_current.get("Rated current", "0"))
+    tripping_characteristic = _extract_string(architecture.get("Curve", ""))
+
+    # --- Capacities ---
+    # Since Hager lacks explicit Ics, we parse Icn to use as our service fallback
+    icn_dict = _parse_capacity("Icn")
+    icu_dict = _parse_capacity("Icu")
+
+    # --- Dimensions ---
+    height = _num(dimensions.get("Height", "0"))
+    width = _num(dimensions.get("Width", "0"))
+    depth = _num(dimensions.get("Depth", "0"))
+
+    # --- Frequency ---
+    freq_str = _extract_string(frequency.get("Frequency", ""))
+    rated_frequency = _parse_frequency(freq_str)
+
+    # --- Documents & Images ---
+    datasheet_list = documents.get("Product datasheet", []) or documents.get("Product data sheet", [])
+    datasheet_url = datasheet_list[0].get("url") if isinstance(datasheet_list, list) and datasheet_list else None
+
+    images_raw = general_info.get("Images", "")
+    image_urls = []
+    if images_raw:
+        image_urls = images_raw if isinstance(images_raw, list) else [images_raw]
+    else:
+        product_images_documents = documents.get("Product image", [])
+        image_urls = [item.get("url") for item in product_images_documents if isinstance(item, dict) and item.get("url")]
+
+    return CanonicalMCB(
+        sku=sku,
+        brand="Hager",
+        display_name=display_name,
+        poles=poles,
+        protected_poles=protected_poles,
+        rated_current_a=rated_current,
+        tripping_characteristic=tripping_characteristic,
+        voltage_to_service_short_circuit_breaking_capacity_ka=icn_dict,
+        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
+        height_mm=height,
+        width_mm=width,
+        depth_mm=depth,
+        datasheet_url=datasheet_url,
+        image_urls=image_urls if image_urls else None,
+        rated_frequency_hz=rated_frequency,
         weight_kg=None
     )
