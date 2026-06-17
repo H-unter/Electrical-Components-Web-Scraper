@@ -1,18 +1,15 @@
 import json
 import re
-import time
-from datetime import datetime, timezone
-from pathlib import Path
 
-import requests
 from bs4 import BeautifulSoup
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from ..BrandScraper import BrandScraper
 from ..utils import get_html_soup, write_json
 from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
+from ..CanonicalMotorOperator import CanonicalMotorOperator
 
 class AbbScraper(BrandScraper):
     """Scraper for ABB product pages at new.abb.com/products."""
@@ -458,4 +455,52 @@ def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None
         image_urls=image_urls if image_urls else None,
         rated_frequency_hz=_parse_frequency(_extract_string("Rated Frequency (f)")),
         weight_kg=weight_kg if weight_kg else None
+    )
+
+def _parse_voltage_string(v_str: str) -> Dict[str, Any]:
+    """
+    Parses strings like '220\u2026250 V AC' or '220 ... 250 V AC'
+    into {'min': 220, 'max': 250, 'unit': 'V'}
+    """
+    # Regex: Capture number1, separator(s), number2, and then the unit
+    pattern = r'(\d+)\s*[…\.]+\s*(\d+)\s*([a-zA-Z]+)'
+    match = re.search(pattern, v_str)
+    
+    if match:
+        return {
+            "min": int(match.group(1)),
+            "max": int(match.group(2)),
+            "unit": match.group(3)
+        }
+    return {"raw": v_str} # Fallback if format is unexpected
+
+def map_abb_to_canonical_motor_operator(raw_data: Dict[str, Any]) -> CanonicalMotorOperator:
+    """
+    Maps a raw ABB JSON dictionary to a CanonicalMotorOperator object with parsed voltage ranges.
+    """
+    gen_info = raw_data.get("General Information", {})
+    tech_info = raw_data.get("Technical", {})
+    add_info = raw_data.get("Additional Information", {})
+    
+    raw_voltages = tech_info.get("Rated Voltage (U<sub>r</sub>)", [])
+    
+    # Process and parse the voltages
+    ac_voltages = [_parse_voltage_string(v) for v in raw_voltages if "AC" in v.upper()]
+    dc_voltages = [_parse_voltage_string(v) for v in raw_voltages if "DC" in v.upper()]
+
+    return CanonicalMotorOperator(
+        sku=gen_info.get("Global ID"),
+        brand="ABB",
+        display_name=gen_info.get("Display Name"),
+        description=gen_info.get("Meta Description"),
+        ean=raw_data.get("Classification", {}).get("Level 1 EAN"),
+        voltage_range_ac=ac_voltages,
+        voltage_range_dc=dc_voltages,
+        current_type=tech_info.get("Current Type"),
+        suitable_for_breakers=[add_info.get("Suitable For", "")],
+        product_class=add_info.get("Suitable for Product Class"),
+        configuration_type=tech_info.get("Configuration Type"),
+        is_auto_reset="Auto-Reset" in gen_info.get("Display Name", ""),
+        standards=tech_info.get("Standards", []),
+        image_urls=gen_info.get("Images", [])
     )
