@@ -1,4 +1,4 @@
-from scraper import HagerScraper, AbbScraper
+from scraper import HagerScraper, AbbScraper, RittalScraper
 from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor
 from scraper.brands.hager import map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor
 from scraper.utils import write_json
@@ -38,19 +38,31 @@ hager_mcbs_of_interest = [
    'https://hager.com/au/products/product-information/msn250-mcb-2p-6ka-c-50a-2m',
    'https://hager.com/au/products/product-information/hmc280t-mcb-2p-15ka-c-80a-3m'
 ]
-def main():
-   for i, product in enumerate(abb_mcbs_of_interest):
-      print(f"Processing ABB MCB: {product}")
-      raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=False, export_path=f"./output/abb_mcb_{i}_raw.json")
-      canonical_mcb = map_abb_to_canonical_mcb(raw_dictionary)
-      write_json(raw_dictionary, f"./output/abb_mcb_{i}_raw.json")
-      write_json(canonical_mcb.to_dict(), f"./output/abb_mcb_{i}_canonical.json")
 
-   for i, product in enumerate(hager_mcbs_of_interest):
-      print(f"Processing Hager MCB: {product}")
-      raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_mcb_{i}_raw.json")
-      canonical_mcb = map_hager_to_canonical_mcb(raw_dictionary)
-      write_json(canonical_mcb.to_dict(), f"./output/hager_mcb_{i}_canonical.json")
+rittal_urls_of_interest = [
+    'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20231512SCH301/PRO0023?variantId=1280500',
+    'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20240111SCH301/PRO70035?variantId=8004000',
+    'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20231512SCH301/PRO0023?variantId=1350500'
+]
+
+def main():
+   # for i, product in enumerate(abb_mcbs_of_interest):
+   #    print(f"Processing ABB MCB: {product}")
+   #    raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=False, export_path=f"./output/abb_mcb_{i}_raw.json")
+   #    canonical_mcb = map_abb_to_canonical_mcb(raw_dictionary)
+   #    write_json(raw_dictionary, f"./output/abb_mcb_{i}_raw.json")
+   #    write_json(canonical_mcb.to_dict(), f"./output/abb_mcb_{i}_canonical.json")
+
+   # for i, product in enumerate(hager_mcbs_of_interest):
+   #    print(f"Processing Hager MCB: {product}")
+   #    raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_mcb_{i}_raw.json")
+   #    canonical_mcb = map_hager_to_canonical_mcb(raw_dictionary)
+   #    write_json(canonical_mcb.to_dict(), f"./output/hager_mcb_{i}_canonical.json")
+
+   for i, product in enumerate(rittal_urls_of_interest):
+      print(f"Processing Rittal Product: {product}")
+      raw_dictionary = RittalScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/rittal_product_{i}_raw.json")
+      write_json(raw_dictionary, f"./output/rittal_product_{i}_raw.json")
 
 if __name__ == "__main__":
     main()

@@ -8,3 +8,4 @@
 scraped_outputs.xlsx
 *.csv
 *.json
+/rittal_example_file
