@@ -533,6 +533,7 @@ def map_abb_to_canonical_motor_operator(raw_data: Dict[str, Any]) -> CanonicalMo
         standards=tech_info.get("Standards", []),
         image_urls=gen_info.get("Images", [])
     )
+
 def map_abb_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolator:
     """
     Maps ABB Isolator raw JSON to a CanonicalIsolator object, 

@@ -4,13 +4,14 @@ import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from ..BrandScraper import BrandScraper
 from ..utils import clean_text, write_json
 from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
+from ..CanonicalIsolator import CanonicalIsolator
 
 class HagerScraper(BrandScraper):
     """Scraper for Hager product pages at hager.com."""
@@ -438,4 +439,39 @@ def map_hager_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | No
     )
 
 
+def map_hager_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolator:
+    """
+    Maps Hager Isolator raw JSON to a CanonicalIsolator object.
+    """
+    gen_info = raw_data.get("General Information", {})
+    arch = raw_data.get("Architecture", {})
+    elec = raw_data.get("Electric current", {})
+    volt = raw_data.get("Voltage", {})
+    dims = raw_data.get("Dimensions", {})
 
+    # Helper to clean and parse numeric values from strings like "80 A" or "17,50 mm"
+    def parse_float(val: Any) -> Optional[float]:
+        if not val: return None
+        # Replace comma with dot for European/Hager format, then find number
+        clean_val = str(val).replace(',', '.')
+        match = re.search(r'\d+(\.\d+)?', clean_val)
+        return float(match.group()) if match else None
+
+    return CanonicalIsolator(
+        sku=gen_info.get("SKU"),
+        brand="Hager",
+        display_name=gen_info.get("Display Name"),
+        rated_current_a=parse_float(elec.get("Rated current")),
+        number_of_poles=int(arch.get("Number of poles", 0)),
+        # Mapping Hager's "Rated operational voltage Ue" to canonical structure
+        operational_voltage={
+            "minimum": volt.get("Rated operational voltage Ue", "N/A").split("-")[0].strip(),
+            "maximum": volt.get("Rated operational voltage Ue", "N/A").split("-")[-1].strip()
+        },
+        voltage_protection_level=None, # Hager structure differs; check "Rated insulation voltage Ui"
+        datasheet_url=gen_info.get("Product URL"),
+        width_mm=parse_float(dims.get("Width")),
+        height_mm=parse_float(dims.get("Height")),
+        depth_mm=parse_float(dims.get("Depth")),
+        image_urls=[gen_info.get("Images")] if gen_info.get("Images") else []
+    )
