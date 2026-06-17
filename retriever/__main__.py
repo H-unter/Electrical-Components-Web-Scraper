@@ -1,8 +1,8 @@
 import argparse
 import sys
 
-from scraper.brands.abb import AbbScraper
-from scraper.brands.hager import HagerScraper
+from retriever.scrapers.AbbScraper import AbbScraper
+from retriever.scrapers.HagerScraper import HagerScraper
 
 BRANDS = {
     "abb": AbbScraper,

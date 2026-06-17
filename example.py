@@ -1,7 +1,6 @@
-from scraper import HagerScraper, AbbScraper, RittalScraper
-from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor, map_abb_to_canonical_motor_operator, map_abb_to_canonical_isolator, map_abb_to_canonical_spreader
-from scraper.brands.hager import map_hager_to_canonical_isolator, map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor, map_hager_to_canonical_spreader
-from scraper.utils import write_json
+from retriever import HagerScraper, AbbScraper, RittalScraper
+from retriever.mappers import map_to
+from retriever.scrapers.utils import write_json
 
 abb_mccbs_of_interest = [
    '1SDA067416R1',
@@ -81,7 +80,7 @@ def main():
    for i, product in enumerate(hager_spreaders_of_interest):
       print(f"Processing Hager Spreader: {product}")
       raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_spreader_{i}_raw.json")
-      canonical_spreader = map_hager_to_canonical_spreader(raw_dictionary)
+      canonical_spreader = map_to("hager", "spreader", raw_dictionary)
       write_json(canonical_spreader.to_dict(), f"./output/hager_spreader_{i}_canonical.json")
 
    # for i, product in enumerate(rittal_urls_of_interest):

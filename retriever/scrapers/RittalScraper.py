@@ -3,8 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 from typing import Optional, Any
 
-from scraper.utils import write_json
-from ..BrandScraper import BrandScraper
+from retriever.scrapers.utils import write_json
+from .BrandScraper import BrandScraper
 
 class RittalScraper(BrandScraper):
     """Scraper for Rittal Products."""

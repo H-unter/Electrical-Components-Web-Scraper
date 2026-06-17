@@ -9,3 +9,7 @@ scraped_outputs.xlsx
 *.csv
 *.json
 /rittal_example_file
+/retriever/__pycache__
+/retriever/mappers/__pycache__
+/retriever/models/__pycache__
+/retriever/scrapers/__pycache__

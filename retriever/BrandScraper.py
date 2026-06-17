@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 import pandas as pd
 
-from scraper.utils import write_json, get_html_soup
+from retriever.scrapers.utils import write_json, get_html_soup
 
 class BrandScraper(ABC):
     """Abstract base class for all brand-specific scrapers."""
