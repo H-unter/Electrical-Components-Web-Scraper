@@ -1,10 +1,10 @@
 # Electrical Components Web Scraper
 
-A Python package for scraping technical specifications from manufacturer product pages. Given a SKU, it returns a structured pandas DataFrame (and optionally a CSV) with consistent column formatting across brands.
+A Python package for scraping technical specifications from manufacturer product pages. Given a SKU, it converts raw web data into a structured, canonical JSON format.
 
 ## Installation
 
-Clone the repo and install in editable mode from the **project root** (where `pyproject.toml` lives):
+Clone the repo and install in editable mode from the project root (where `pyproject.toml` lives):
 
 ```bash
 pip install -e .
@@ -15,29 +15,41 @@ pip install -e .
 ### As a Python import
 
 ```python
-from scraper import HagerScraper, AbbScraper
+from retriever.scrapers.AbbScraper import AbbScraper
+from retriever.scrapers.HagerScraper import HagerScraper
 
-df = HagerScraper().scrape("HEC041H", export_csv=True)
-df = AbbScraper().scrape("1SDA068056R1", export_csv=True)
+# Scrape using the direct product URL
+url = "https://new.abb.com/products/1SDA068056R1/xt1n-160-tmd-16-450-3p-ff"
+raw_data = AbbScraper().return_dictionary_content(url=url) # this will be the 'brand specific' information which will have differing structure
+
+mccb = map_to(brand, comp_type, raw_data)
+json_data = mccb.to_dict() # this is the standardised format
+
+# export
+filename = f"./output/my_mccb.json"
+write_json(json_data, filename)
 ```
 
 ### From the command line
 
+
+
 ```bash
-scraper HEC041H hager --csv
-scraper 1SDA068056R1 abb --csv
-scraper HEC041H hager --csv --out my_output.csv  # custom output path
+python run.py --help
 ```
 
-### Output format
+Run the scraper using `run.py` by providing the brand and the product URL:
+```bash
+python run.py abb https://new.abb.com/products/1SDA068056R1/xt3n-250-tmd-125-1250-3p-f-f
+python run.py abb https://new.abb.com/products/1SDA068056R1/xt3n-250-tmd-125-1250-3p-f-f --canonical --type mccb
+```
 
-Every brand returns a DataFrame with three columns:
+## Data Output
 
-| Attribute Group | Attribute | Attribute Value |
-|---|---|---|
-| General Information | Display Name | HEC041H |
-| Electric current | Rated current | 40 A |
-| ... | ... | ... |
+This project produces:
+
+1. **Raw JSON:** The raw extracted data from the product page.
+2. **Canonical JSON:** A standardized, unified data structure (e.g., `CanonicalMCB`, `CanonicalContactor`) mapped from the raw data.
 
 ## Supported Brands
 
@@ -45,39 +57,27 @@ Every brand returns a DataFrame with three columns:
 |---|---|
 | **ABB** | Extracts the embedded `var model` viewmodel JSON block from the product page script tag |
 | **Hager** | Resolves the product URL from regional XML sitemaps, then parses the technical property grid via CSS selectors |
+| **Rittal** | Only for enclosures |
 
 ## Adding a New Brand
 
-1. Create `scraper/brands/newbrand.py` subclassing `BrandScraper`
-2. Implement `get_soup(sku)` and `extract_product_info(soup)`
-3. Register it in `scraper/brands/__init__.py` and `scraper/__main__.py`
-
-```python
-from ..base import BrandScraper
-
-class NewBrandScraper(BrandScraper):
-
-    def get_soup(self, sku: str):
-        # fetch and return BeautifulSoup for this SKU
-        ...
-
-    def extract_product_info(self, soup) -> dict:
-        # parse and return nested dict
-        ...
-```
+1. Create a new scraper in `retriever/scrapers/` inheriting from `BrandScraper`.
+2. Implement the `return_dictionary_content` method, ensuring it accepts a `url` parameter to fetch HTML via `self.return_html_content(url)`.
+3. Create a corresponding mapper in `retriever/mappers/` to convert the raw data into one of the `Canonical` models located in `retriever/models/`.
+4. Register the new scraper in `retriever/scrapers/__init__.py`.
 
 ## Project Structure
 
 ```
 ├── pyproject.toml
-├── requirements.txt
-├── main.py
-└── scraper/
-    ├── __init__.py        # exports all scrapers
-    ├── __main__.py        # CLI entry point
-    ├── base.py            # BrandScraper abstract base class
-    ├── utils.py           # shared helpers
-    └── brands/
-        ├── abb.py
-        └── hager.py
+├── run.py                 # CLI entry point
+└── retriever/
+    ├── __init__.py
+    ├── __main__.py
+    ├── scrapers/          # Brand-specific extraction logic
+    │   ├── BrandScraper.py# Abstract base class
+    │   ├── AbbScraper.py
+    │   └── HagerScraper.py
+    ├── mappers/           # Logic to map raw data to canonical models
+    └── models/            # Standardized Canonical classes (MCB, Contactor, etc.)
 ```
