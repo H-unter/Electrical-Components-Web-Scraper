@@ -4,6 +4,8 @@ import re
 from bs4 import BeautifulSoup
 from typing import List, Optional, Dict, Any
 
+from scraper.brands.CanonicalSpreader import CanonicalSpreader
+
 from ..BrandScraper import BrandScraper
 from ..utils import get_html_soup, write_json
 from ..CanonicalMCCB import CanonicalMCCB
@@ -580,5 +582,40 @@ def map_abb_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolator
         height_mm=parse_dim("Product Net Height"),
         depth_mm=parse_dim("Product Net Depth / Length"),
         modular_spacings=int(dims.get("Width in Number of Modular Spacings", 0)),
+        image_urls=gen_info.get("Images", [])
+    )
+
+
+def map_abb_to_canonical_spreader(raw_data: Dict[str, Any]) -> CanonicalSpreader:
+    gen_info = raw_data.get("General Information", {})
+    add_info = raw_data.get("Additional Information", {})
+    tech = raw_data.get("Technical", {})
+    order = raw_data.get("Ordering", {})
+    dims = raw_data.get("Dimensions", {})  # Added Dimensions
+    certs = raw_data.get("Certificates and Declarations", {})
+    
+    # 1. Look for 'Product Net Weight' in Dimensions first
+    # 2. Fallback to 'Package Level 1 Gross Weight' if not found
+    weight_str = dims.get("Product Net Weight") or dims.get("Package Level 1 Gross Weight", "0")
+    
+    # Extract numeric value
+    weight_match = re.search(r'[\d\.]+', str(weight_str))
+    weight_val = float(weight_match.group()) if weight_match else None
+
+    # Handle suitable for (ensure it's a list)
+    suitable = add_info.get("Suitable For", [])
+    suitable_list = [suitable] if isinstance(suitable, str) else suitable
+
+    return CanonicalSpreader(
+        sku=gen_info.get("Global ID"),
+        brand="ABB",
+        display_name=gen_info.get("Display Name"),
+        description=gen_info.get("Meta Description"),
+        datasheet_url=get_datasheet_url(certs),
+        weight_kg=weight_val,
+        configuration_type=tech.get("Configuration Type"),
+        number_of_poles=tech.get("Number of Poles"),
+        order_multiple=tech.get("Order Multiple"),
+        suitable_for=suitable_list,
         image_urls=gen_info.get("Images", [])
     )
