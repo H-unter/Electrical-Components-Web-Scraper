@@ -4,7 +4,6 @@ import re
 from bs4 import BeautifulSoup
 from typing import List, Optional, Dict, Any
 
-from scraper.brands.CanonicalSpreader import CanonicalSpreader
 
 from ..BrandScraper import BrandScraper
 from ..utils import get_html_soup, write_json
@@ -13,6 +12,7 @@ from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 from ..CanonicalMotorOperator import CanonicalMotorOperator
 from ..CanonicalIsolator import CanonicalIsolator
+from ..CanonicalSpreader import CanonicalSpreader
 
 class AbbScraper(BrandScraper):
     """Scraper for ABB product pages at new.abb.com/products."""

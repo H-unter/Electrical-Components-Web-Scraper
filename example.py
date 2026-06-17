@@ -1,6 +1,6 @@
 from scraper import HagerScraper, AbbScraper, RittalScraper
 from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor, map_abb_to_canonical_motor_operator, map_abb_to_canonical_isolator, map_abb_to_canonical_spreader
-from scraper.brands.hager import map_hager_to_canonical_isolator, map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor
+from scraper.brands.hager import map_hager_to_canonical_isolator, map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor, map_hager_to_canonical_spreader
 from scraper.utils import write_json
 
 abb_mccbs_of_interest = [
@@ -58,6 +58,12 @@ hager_isolators_of_interest = [
    'https://hager.com/au/products/product-information/jg220in-ip66-20a-2p-isolator'
 ]
 
+hager_spreaders_of_interest = [
+   'https://hager.com/au/products/product-information/hya014h-spreader-x160-3p-collar',
+   'https://hager.com/au/products/product-information/hyb011h-spreader-x-p250-p250-3p',
+   'https://hager.com/au/products/product-information/hyw011h-spread-term-extens-x630-p630-3p-400a'
+]
+
 rittal_urls_of_interest = [
     'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20231512SCH301/PRO0023?variantId=1280500',
     'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20240111SCH301/PRO70035?variantId=8004000',
@@ -66,17 +72,17 @@ rittal_urls_of_interest = [
 
 
 def main():
-   for i, product in enumerate(abb_spreaders_of_interest):
-      print(f"Processing ABB Spreader: {product}")
-      raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/abb_spreader_{i}_raw.json")
-      canonical_spreader = map_abb_to_canonical_spreader(raw_dictionary)
-      write_json(canonical_spreader.to_dict(), f"./output/abb_spreader_{i}_canonical.json")
+   # for i, product in enumerate(abb_spreaders_of_interest):
+   #    print(f"Processing ABB Spreader: {product}")
+   #    raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/abb_spreader_{i}_raw.json")
+   #    canonical_spreader = map_abb_to_canonical_spreader(raw_dictionary)
+   #    write_json(canonical_spreader.to_dict(), f"./output/abb_spreader_{i}_canonical.json")
 
-   # for i, product in enumerate(hager_isolators_of_interest):
-   #    print(f"Processing Hager Isolator: {product}")
-   #    raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_isolator_{i}_raw.json")
-   #    canonical_isolator = map_hager_to_canonical_isolator(raw_dictionary)
-   #    write_json(canonical_isolator.to_dict(), f"./output/hager_isolator_{i}_canonical.json")
+   for i, product in enumerate(hager_spreaders_of_interest):
+      print(f"Processing Hager Spreader: {product}")
+      raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_spreader_{i}_raw.json")
+      canonical_spreader = map_hager_to_canonical_spreader(raw_dictionary)
+      write_json(canonical_spreader.to_dict(), f"./output/hager_spreader_{i}_canonical.json")
 
    # for i, product in enumerate(rittal_urls_of_interest):
    #    print(f"Processing Rittal Product: {product}")

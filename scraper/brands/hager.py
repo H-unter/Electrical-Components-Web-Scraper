@@ -6,12 +6,15 @@ import requests
 from bs4 import BeautifulSoup
 from typing import Optional, Dict, Any
 
+from scraper import CanonicalSpreader
+
 from ..BrandScraper import BrandScraper
 from ..utils import clean_text, write_json
 from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 from ..CanonicalIsolator import CanonicalIsolator
+from ..CanonicalSpreader import CanonicalSpreader
 
 class HagerScraper(BrandScraper):
     """Scraper for Hager product pages at hager.com."""
@@ -30,6 +33,8 @@ class HagerScraper(BrandScraper):
             "General Information": self._extract_general_info(source_data),
             **self._extract_specs(source_data),
             "Documents": self._extract_documents(source_data),
+            # Add the extracted list as a new key
+            "Compatible Products": self._extract_compatible_products(source_data) if source_data else []
         }
         
         is_export_requested = export_json and export_path and result
@@ -37,7 +42,11 @@ class HagerScraper(BrandScraper):
             write_json(result, export_path)
             
         return result
-
+    
+    def _extract_compatible_products(self, soup: BeautifulSoup) -> list:
+        """Helper to extract .product-list__name tags."""
+        return [item.get_text(strip=True) for item in soup.select(".product-list__name")]
+   
     # ------------------------------------------------------------------
     # Extraction helpers
     # ------------------------------------------------------------------
@@ -474,4 +483,42 @@ def map_hager_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolat
         height_mm=parse_float(dims.get("Height")),
         depth_mm=parse_float(dims.get("Depth")),
         image_urls=[gen_info.get("Images")] if gen_info.get("Images") else []
+    )
+
+
+def get_compatible_skus(self, modal_soup):
+    """
+    Extracts all compatible SKUs from the 'Suitable with' modal.
+    """
+    # Locates all spans with the specific class and pulls the text
+    compatible_skus = [
+        item.get_text(strip=True) 
+        for item in modal_soup.select(".product-list__name")
+    ]
+    return compatible_skus
+
+def map_hager_to_canonical_spreader(raw_dictionary: dict) -> CanonicalSpreader:
+    """
+    Transforms Hager raw data into a CanonicalSpreader instance.
+    """
+    gen = raw_dictionary.get("General Information", {})
+    elec = raw_dictionary.get("Electric current", {})
+    arch = raw_dictionary.get("Architecture", {})
+
+    return CanonicalSpreader(
+        sku=gen.get("SKU"),
+        brand="Hager",
+        display_name=gen.get("Display Name"),
+        description=gen.get("Description"),
+        # Added new fields
+        categories=[gen.get("Category 1"), gen.get("Category 2"), gen.get("Category 3")],
+        rated_current=elec.get("Rated current"),
+        number_of_poles=arch.get("Type of pole"), # "3P"
+        # Existing fields
+        suitable_for=raw_dictionary.get("Compatible Products", []),
+        image_urls=[gen.get("Images")] if gen.get("Images") else [],
+        datasheet_url=None, # Update if scraping logic is added
+        weight_kg=None,
+        configuration_type=None,
+        order_multiple=None
     )
