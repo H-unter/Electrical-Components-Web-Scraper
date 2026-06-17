@@ -7,111 +7,35 @@ from bs4 import BeautifulSoup
 from typing import Optional
 
 from ..BrandScraper import BrandScraper
-from ..utils import clean_text
+from ..utils import clean_text, write_json
 from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 
-
 class HagerScraper(BrandScraper):
-    """Scraper for Hager product pages at hager.com.
-
-    Regional sitemaps are queried in the order defined by FALLBACK_REGIONS.
-    The first region that contains the SKU is used.
-    """
-
-    FALLBACK_REGIONS = ["au", "uk", "nz"]
-    HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-
-    # ------------------------------------------------------------------
-    # BrandScraper interface
-    # ------------------------------------------------------------------
-
-    def get_soup(self, sku: str) -> BeautifulSoup | None:
-        """Looks up the SKU across regional sitemaps and returns its page soup."""
-        url = self._find_product_url(sku)
-        if not url:
-            return None
-        try:
-            res = requests.get(url, headers=self.HEADERS, timeout=10)
-            res.raise_for_status()
-            return BeautifulSoup(res.text, "html.parser")
-        except Exception as e:
-            print(f"Failed to fetch Hager page for '{sku}': {e}")
-            return None
-
-    def extract_product_info(self, soup: BeautifulSoup) -> dict:
-        """Parses the Hager product page into a nested dict."""
-        if not soup:
-            return {}
-        return {
-            "General Information": self._extract_general_info(soup),
-            **self._extract_specs(soup),
-            "Documents": self._extract_documents(soup),
-        }
-
-    def to_dataframe(self, product_info: dict) -> pd.DataFrame:
-        """Flattens the Hager dict, with special handling for the Documents section."""
-        if not product_info:
-            return pd.DataFrame(columns=["Attribute Group", "Attribute", "Attribute Value"])
-        rows = []
-        for group, attrs in product_info.items():
-            if group == "Documents":
-                for doc_cat, doc_list in attrs.items():
-                    for doc in doc_list:
-                        val = " | ".join(filter(None, [
-                            doc.get("title", ""),
-                            doc.get("file_type", ""),
-                            doc.get("file_size", ""),
-                            doc.get("url", ""),
-                        ]))
-                        rows.append({
-                            "Attribute Group": f"Documents \u2013 {doc_cat}",
-                            "Attribute": doc.get("title", ""),
-                            "Attribute Value": val,
-                        })
-            else:
-                for attr, val in attrs.items():
-                    val_str = "\n".join(val) if isinstance(val, list) else str(val)
-                    rows.append({
-                        "Attribute Group": group,
-                        "Attribute": attr,
-                        "Attribute Value": val_str,
-                    })
-        return pd.DataFrame(rows)
-
-    # ------------------------------------------------------------------
-    # Sitemap lookup
-    # ------------------------------------------------------------------
-
-    def _find_product_url(self, sku: str) -> str | None:
-        sku = sku.upper().strip()
+    """Scraper for Hager product pages at hager.com."""
+    
+    def return_dictionary_content(self, data=None, url: str | None = None, export_json: bool = False, export_path: str | None = None) -> dict | None:
+        source_data = data
+        is_fetch_required = source_data is None and url is not None
         
-        sitemaps = [
-            (region, f"https://hager.com/{region}/products/media/sitemap_{region}.xml")
-            for region in self.FALLBACK_REGIONS
-        ]
-        sitemaps.append(("intl-en", "https://hager.com/intl-en/catalogue/media/sitemap_intl_en.xml"))
-
-        for region, url in sitemaps:
-            try:
-                res = requests.get(url, headers=self.HEADERS, timeout=15)
-                res.raise_for_status()
-                soup = BeautifulSoup(res.text, "xml")
-                
-                for loc in soup.find_all("loc"):
-                    slug = loc.text.split("/")[-1]
-                    match = re.match(r"^([a-z0-9]+)-", slug)
-                    if match and match.group(1).upper() == sku:
-                        print(f"Found '{sku}' in region '{region}': {loc.text}")
-                        return loc.text
-                        
-                print(f"'{sku}' not in region '{region}', trying next...")
-            except Exception as e:
-                print(f"Sitemap fetch failed for region '{region}': {e}")
-
-        print(f"'{sku}' not found in any region.")
-        return None
+        if is_fetch_required:
+            source_data = self.return_html_content(url)
+            
+        if not source_data:
+            return None
+            
+        result = {
+            "General Information": self._extract_general_info(source_data),
+            **self._extract_specs(source_data),
+            "Documents": self._extract_documents(source_data),
+        }
+        
+        is_export_requested = export_json and export_path and result
+        if is_export_requested:
+            write_json(result, export_path)
+            
+        return result
 
     # ------------------------------------------------------------------
     # Extraction helpers
@@ -218,8 +142,8 @@ class HagerScraper(BrandScraper):
                 "file_type":   clean_text(ext_el.text)   if ext_el   else "",
                 "file_size":   clean_text(size_el.text)  if size_el  else "",
             })
-        return documents
-    
+            return documents
+
 def map_hager_to_canonical_mccb(raw_dictionary: dict|None) -> CanonicalMCCB|None:
     """Transforms raw parsed Hager dictionary structures into a CanonicalMCCB instance."""
     if not raw_dictionary: return None  # Fast escape if raw data extraction was unsuccessful
@@ -512,3 +436,6 @@ def map_hager_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | No
         rated_frequency_hz=rated_frequency,
         weight_kg=None
     )
+
+
+

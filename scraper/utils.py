@@ -7,7 +7,7 @@ def clean_text(text: str) -> str:
     return " ".join(text.replace("\xad", "").split()).strip()
 
 
-def write_json(data: dict, filepath: str) -> None:
+def write_json(data, filepath) -> None:
     """Saves a dictionary to a JSON file."""
     try:
         with open(filepath, "w", encoding="utf-8") as f:

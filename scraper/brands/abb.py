@@ -9,265 +9,35 @@ from bs4 import BeautifulSoup
 from typing import Optional
 
 from ..BrandScraper import BrandScraper
-from ..utils import get_html_soup
+from ..utils import get_html_soup, write_json
 from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 
-
-
-# Cache file lives alongside this source file so it travels with the project
-_CACHE_PATH = Path(__file__).parent / "abb_sitemap_cache.json"
-_CACHE_MAX_AGE_DAYS = 7   # re-fetch after this many days
-
-
 class AbbScraper(BrandScraper):
-    """Scraper for ABB product pages at new.abb.com/products.
+    """Scraper for ABB product pages at new.abb.com/products."""
 
-    URL resolution strategy
-    -----------------------
-    ABB product URLs have the form:
-        https://new.abb.com/products/{ARTICLE_NUMBER}/{slug}
+    def return_dictionary_content(self, data=None, url: str | None = None, export_json: bool = False, export_path: str | None = None) -> dict | None:
+        source_data = data
+        is_fetch_required = source_data is None and url is not None
+        
+        if is_fetch_required:
+            source_data = self.return_html_content(url)
+            
+        if not source_data:
+            return None
 
-    The article number (e.g. 1SBL367201R1300) cannot be derived from a type
-    designation (e.g. AF52400013), so we resolve it via a slug → full-URL
-    lookup table built from ABB's product sitemaps.
-
-    The lookup table is persisted to ``scraper/brands/abb_sitemap_cache.json``
-    so the 27 sitemaps are only fetched once and reused across runs.
-    The cache is automatically refreshed when it is older than
-    ``_CACHE_MAX_AGE_DAYS`` days, or when ``force_refresh=True`` is passed
-    to the constructor.
-
-    Constructor parameters
-    ----------------------
-    force_refresh : bool
-        Pass ``True`` to ignore any existing cache and re-download all
-        sitemaps immediately.  Useful after a large ABB catalog update.
-    """
-
-    BASE_URL         = "https://new.abb.com/products"
-    SITEMAP_BASE_URL = "https://new.abb.com/pissitemap"
-
-    HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        )
-    }
-
-    # In-process cache — shared across all instances within one Python session
-    _slug_to_url: dict[str, str] = {}
-    _in_memory_loaded: bool = False
-
-    def __init__(self, force_refresh: bool = False) -> None:
-        self._force_refresh = force_refresh
-
-    # ------------------------------------------------------------------
-    # BrandScraper interface
-    # ------------------------------------------------------------------
-
-    def get_soup(self, sku: str) -> BeautifulSoup | None:
-        """Resolve the canonical product URL for *sku* and return its soup."""
-        clean_sku = sku.strip().strip("/")
-
-        # Warm the in-process cache (reads disk cache or fetches from web)
-        if not AbbScraper._in_memory_loaded or self._force_refresh:
-            self._ensure_cache_loaded()
-
-        # 1. Derive slug and look it up
-        slug = self._derive_slug(clean_sku)
-        cached_url = AbbScraper._slug_to_url.get(slug)
-        if cached_url:
-            soup = get_html_soup(cached_url)
-            if soup:
-                return soup
-
-        # 2. Fallback — direct URLs (MCCBs whose article number = URL segment)
-        for url in (
-            f"{self.BASE_URL}/{clean_sku.upper()}",
-            f"{self.BASE_URL}/{clean_sku.lower()}",
-        ):
-            soup = get_html_soup(url)
-            if soup:
-                return soup
-
-        print(f"Could not retrieve page for SKU '{sku}'.")
-        return None
-
-    def extract_product_info(self, soup: BeautifulSoup) -> dict:
-        """Parses the embedded JS `model` variable and returns a nested dict."""
-        viewmodel = self._extract_viewmodel(soup)
+        viewmodel = source_data if isinstance(source_data, dict) else self._extract_viewmodel(source_data)
         if not viewmodel:
-            return {}
-        return self._parse_viewmodel(viewmodel)
-
-    # ------------------------------------------------------------------
-    # Slug derivation
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def _derive_slug(sku: str) -> str:
-        """Convert a compact ABB type designation into its URL slug form.
-
-        Rules
-        -----
-        * Already has dashes → lowercase only.
-          ESB63-22N-06  →  esb63-22n-06
-        * Pure letter-prefix + 8+ digit body (AF contactors):
-          Last 6 digits = 3 × 2-digit config codes; rest = frame size.
-          AF52400013  →  af52-40-00-13
-          AF145300013 →  af145-30-00-13
-        * Anything else (MCCB article numbers like 1SDA067416R1) → lowercase.
-          The sitemap cache will still match it if ABB uses it as a slug.
-        """
-        sku = sku.strip()
-
-        if "-" in sku:
-            return sku.lower()
-
-        m = re.match(r'^([A-Za-z]+)(\d+)$', sku)
-        if m:
-            letters = m.group(1).lower()
-            digits  = m.group(2)
-            if len(digits) >= 8:
-                frame  = digits[:-6]
-                config = digits[-6:]
-                pairs  = [config[i:i+2] for i in range(0, 6, 2)]
-                return "-".join([letters + frame] + pairs)
-
-        return sku.lower()
-
-    # ------------------------------------------------------------------
-    # Cache management
-    # ------------------------------------------------------------------
-
-    def _ensure_cache_loaded(self) -> None:
-        """Load slug → URL table from disk cache, or rebuild it from the web.
-
-        Decision logic:
-          1. If force_refresh=True                    → fetch from web, save
-          2. Disk cache exists and is fresh enough    → load from disk
-          3. Disk cache missing or stale              → fetch from web, save
-        """
-        if self._force_refresh:
-            print("force_refresh=True — rebuilding ABB sitemap cache from web…")
-            self._fetch_and_save_cache()
-            return
-
-        if _CACHE_PATH.exists():
-            age_days = self._cache_age_days()
-            if age_days <= _CACHE_MAX_AGE_DAYS:
-                self._load_from_disk()
-                return
-            else:
-                print(
-                    f"ABB sitemap cache is {age_days:.1f} days old "
-                    f"(limit {_CACHE_MAX_AGE_DAYS}d) — refreshing…"
-                )
-
-        self._fetch_and_save_cache()
-
-    def _cache_age_days(self) -> float:
-        """Return how many days old the on-disk cache is."""
-        try:
-            data = json.loads(_CACHE_PATH.read_text(encoding="utf-8"))
-            saved_at = datetime.fromisoformat(data["saved_at"])
-            now = datetime.now(timezone.utc)
-            # Make saved_at timezone-aware if it isn't already
-            if saved_at.tzinfo is None:
-                saved_at = saved_at.replace(tzinfo=timezone.utc)
-            return (now - saved_at).total_seconds() / 86400
-        except Exception:
-            return float("inf")   # treat unreadable cache as infinitely old
-
-    def _load_from_disk(self) -> None:
-        """Deserialise the JSON cache file into the in-process dict."""
-        try:
-            data = json.loads(_CACHE_PATH.read_text(encoding="utf-8"))
-            AbbScraper._slug_to_url = data["slug_to_url"]
-            AbbScraper._in_memory_loaded = True
-            print(
-                f"ABB sitemap cache loaded from disk "
-                f"({len(AbbScraper._slug_to_url):,} URLs, "
-                f"saved {data.get('saved_at', 'unknown')[:10]})."
-            )
-        except Exception as e:
-            print(f"Failed to read ABB cache from disk: {e} — rebuilding…")
-            self._fetch_and_save_cache()
-
-    def _fetch_and_save_cache(self) -> None:
-        """Download all sitemaps, build the slug → URL dict, write to disk.
-
-        Rather than trusting the sitemap index (which only lists 4 of the 27
-        actual files), we probe sitemap1.xml, sitemap2.xml, … in order and
-        stop as soon as a request returns a 404 or yields zero product URLs.
-        """
-        slug_to_url: dict[str, str] = {}
-        base = "https://new.abb.com/pissitemap"
-
-        print("Fetching ABB sitemaps — this runs once then is cached to disk…")
-        t0 = time.monotonic()
-
-        for n in range(1, 1000):           # upper bound is a safety rail only
-            url   = f"{base}/sitemap{n}.xml"
-            count = self._fetch_sub_sitemap_into(url, slug_to_url)
-            print(f"  sitemap{n}.xml: {count:,} URLs")
-            if count == 0:                 # 404 or empty page — we're done
-                break
-
-        elapsed = time.monotonic() - t0
-        print(f"  Done — {len(slug_to_url):,} total URLs in {elapsed:.1f}s")
-
-        # Persist to disk
-        cache_data = {
-            "saved_at":   datetime.now(timezone.utc).isoformat(),
-            "slug_to_url": slug_to_url,
-        }
-        try:
-            _CACHE_PATH.write_text(
-                json.dumps(cache_data, separators=(",", ":")),
-                encoding="utf-8",
-            )
-            print(f"  Cache saved to {_CACHE_PATH}")
-        except Exception as e:
-            print(f"  Warning: could not save cache to disk: {e}")
-
-        AbbScraper._slug_to_url      = slug_to_url
-        AbbScraper._in_memory_loaded = True
-        self._force_refresh          = False   # don't repeat within same session
-
-    def _fetch_sub_sitemap_into(self, url: str, target: dict) -> int:
-        """Fetch one sub-sitemap and insert slug → URL pairs into *target*.
-
-        Returns the number of product URLs added.  Returns 0 (without printing
-        an error) on a 404, since that is the expected signal that we have
-        iterated past the last sitemap file.  Other HTTP errors are reported.
-        """
-        try:
-            resp = requests.get(url, headers=self.HEADERS, timeout=30)
-            if resp.status_code == 404:
-                return 0          # clean stop signal — not an error
-            resp.raise_for_status()
-            soup  = BeautifulSoup(resp.text, "xml")
-            count = 0
-            for loc in soup.find_all("loc"):
-                full_url = loc.text.strip()
-                if not full_url or "/products/" not in full_url:
-                    continue
-                slug = full_url.rstrip("/").split("/")[-1].lower()
-                if slug:
-                    target[slug] = full_url
-                    count += 1
-            return count
-        except Exception as e:
-            print(f"  Failed to parse {url}: {e}")
-            return 0
-
-    # ------------------------------------------------------------------
-    # Viewmodel extraction (unchanged)
-    # ------------------------------------------------------------------
+            return None
+            
+        result = self._parse_viewmodel(viewmodel)
+        
+        is_export_requested = export_json and export_path and result
+        if is_export_requested:
+            write_json(result, export_path)
+            
+        return result
 
     def _extract_viewmodel(self, soup: BeautifulSoup) -> dict | None:
         for script in soup.find_all("script"):
@@ -318,8 +88,7 @@ class AbbScraper(BrandScraper):
                 )
 
         return result
-
-
+    
 def map_abb_to_canonical_mccb(raw: dict | None) -> CanonicalMCCB | None:
     """Transforms raw parsed ABB dictionary structures into a CanonicalMCCB instance."""
     if not raw:
