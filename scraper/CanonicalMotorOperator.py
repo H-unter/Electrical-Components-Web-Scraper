@@ -13,7 +13,9 @@ class CanonicalMotorOperator:
     # Updated: Stores structured voltage data
     voltage_range_ac: List[Dict[str, Any]] = field(default_factory=list) 
     voltage_range_dc: List[Dict[str, Any]] = field(default_factory=list)
-    
+    operational_voltage: Dict[str, Optional[str]] = field(default_factory=lambda: {"minimum": None, "maximum": None})
+    voltage_protection_level: Optional[str] = None
+    datasheet_url: Optional[str] = None
     current_type: Optional[str] = None
     suitable_for_breakers: List[str] = field(default_factory=list)
     product_class: Optional[str] = None

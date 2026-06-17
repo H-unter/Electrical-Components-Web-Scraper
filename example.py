@@ -1,5 +1,5 @@
 from scraper import HagerScraper, AbbScraper, RittalScraper
-from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor, map_abb_to_canonical_motor_operator
+from scraper.brands.abb import map_abb_to_canonical_mcb, map_abb_to_canonical_mccb, map_abb_to_canonical_contactor, map_abb_to_canonical_motor_operator, map_abb_to_canonical_isolator
 from scraper.brands.hager import map_hager_to_canonical_mcb, map_hager_to_canonical_mccb, map_hager_to_canonical_contactor
 from scraper.utils import write_json
 
@@ -23,6 +23,10 @@ abb_motor_operators_of_interest = [
    'https://new.abb.com/products/1SDA066460R1/mod-xt1-xt3-220-250v-ac-dc',
    'https://new.abb.com/products/1SDA104885R1/moe-xt5-220-250v-ac-dc-auto-reset',
    'https://new.abb.com/products/1SDA104895R1/moe-xt6-220-250v-ac-dc'
+]
+abb_isolators_of_interest = [
+   'https://new.abb.com/products/2CDD272111R0063/shd202-63',
+   'https://new.abb.com/products/2CDD273111R0063/shd203-63',
 ]
 
 hager_contactors_of_interest = [
@@ -52,11 +56,13 @@ rittal_urls_of_interest = [
 
 
 def main():
-   for i, product in enumerate(abb_motor_operators_of_interest):
-      raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/abb_motoroperator_{i}_raw.json")
-      canonical_motor_operator = map_abb_to_canonical_motor_operator(raw_dictionary)
-      write_json(canonical_motor_operator.to_dict(), f"./output/abb_motoroperator_{i}_canonical.json")
-
+   for i, product in enumerate(abb_isolators_of_interest):
+      print(f"Processing ABB Isolator: {product}")
+      raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/abb_isolator_{i}_raw.json")
+      # canonical_mcb = map_abb_to_canonical_mcb(raw_dictionary)
+      # write_json(canonical_mcb.to_dict(), f"./output/abb_isolator_{i}_canonical.json")
+      canonical_isolator = map_abb_to_canonical_isolator(raw_dictionary)
+      write_json(canonical_isolator.to_dict(), f"./output/abb_isolator_{i}_canonical.json")
 
    # for i, product in enumerate(hager_mcbs_of_interest):
    #    print(f"Processing Hager MCB: {product}")

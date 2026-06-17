@@ -2,7 +2,7 @@ import json
 import re
 
 from bs4 import BeautifulSoup
-from typing import Optional, Dict, Any
+from typing import List, Optional, Dict, Any
 
 from ..BrandScraper import BrandScraper
 from ..utils import get_html_soup, write_json
@@ -10,6 +10,7 @@ from ..CanonicalMCCB import CanonicalMCCB
 from ..CanonicalMCB import CanonicalMCB
 from ..CanonicalContactor import CanonicalContactor
 from ..CanonicalMotorOperator import CanonicalMotorOperator
+from ..CanonicalIsolator import CanonicalIsolator
 
 class AbbScraper(BrandScraper):
     """Scraper for ABB product pages at new.abb.com/products."""
@@ -457,6 +458,18 @@ def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None
         weight_kg=weight_kg if weight_kg else None
     )
 
+def extract_voltage_range(raw_list: List[str]) -> Dict[str, Optional[str]]:
+    """Helper to convert list strings into min/max dictionary."""
+    if not raw_list:
+        return {"minimum": None, "maximum": None}
+    
+    # Simple regex to grab numbers from the first entry
+    vals = re.findall(r'\d+', raw_list[0])
+    return {
+        "minimum": f"{vals[0]}V AC" if len(vals) > 0 else None,
+        "maximum": f"{vals[1]}V AC" if len(vals) > 1 else None
+    }
+
 def _parse_voltage_string(v_str: str) -> Dict[str, Any]:
     """
     Parses strings like '220\u2026250 V AC' or '220 ... 250 V AC'
@@ -465,42 +478,106 @@ def _parse_voltage_string(v_str: str) -> Dict[str, Any]:
     # Regex: Capture number1, separator(s), number2, and then the unit
     pattern = r'(\d+)\s*[…\.]+\s*(\d+)\s*([a-zA-Z]+)'
     match = re.search(pattern, v_str)
-    
     if match:
         return {
-            "min": int(match.group(1)),
-            "max": int(match.group(2)),
+            "minimum": float(match.group(1)),
+            "maximum": float(match.group(2)),
             "unit": match.group(3)
         }
-    return {"raw": v_str} # Fallback if format is unexpected
+    return {"minimum": None, "maximum": None, "unit": None}
+
+def get_datasheet_url(certs: Dict[str, Any]) -> Optional[str]:
+    """Helper to extract the first available technical datasheet URL."""
+    ds_list = certs.get("Data Sheet, Technical Information", [])
+    if isinstance(ds_list, list) and ds_list:
+        return f"https://search.abb.com/library/Download.aspx?DocumentID={ds_list[0]}&LanguageCode=en"
+    return None
+
+def extract_operational_voltage(tech_info: Dict[str, Any]) -> Dict[str, Optional[str]]:
+    """Parses Rated Voltage to the new operational_voltage structure."""
+    raw_voltages = tech_info.get("Rated Voltage (U<sub>r</sub>)", [])
+    if not raw_voltages:
+        return {"minimum": None, "maximum": None}
+    
+    # Use the regex parser you already have to get numbers
+    vals = re.findall(r'\d+', str(raw_voltages[0]))
+    return {
+        "minimum": f"{vals[0]}V" if len(vals) > 0 else None,
+        "maximum": f"{vals[1]}V" if len(vals) > 1 else vals[0] + "V" # Handle single voltage
+    }
 
 def map_abb_to_canonical_motor_operator(raw_data: Dict[str, Any]) -> CanonicalMotorOperator:
-    """
-    Maps a raw ABB JSON dictionary to a CanonicalMotorOperator object with parsed voltage ranges.
-    """
     gen_info = raw_data.get("General Information", {})
     tech_info = raw_data.get("Technical", {})
     add_info = raw_data.get("Additional Information", {})
+    certs = raw_data.get("Certificates and Declarations", {})
     
-    raw_voltages = tech_info.get("Rated Voltage (U<sub>r</sub>)", [])
-    
-    # Process and parse the voltages
-    ac_voltages = [_parse_voltage_string(v) for v in raw_voltages if "AC" in v.upper()]
-    dc_voltages = [_parse_voltage_string(v) for v in raw_voltages if "DC" in v.upper()]
-
     return CanonicalMotorOperator(
         sku=gen_info.get("Global ID"),
         brand="ABB",
         display_name=gen_info.get("Display Name"),
         description=gen_info.get("Meta Description"),
         ean=raw_data.get("Classification", {}).get("Level 1 EAN"),
-        voltage_range_ac=ac_voltages,
-        voltage_range_dc=dc_voltages,
+        # New Fields
+        operational_voltage=extract_operational_voltage(tech_info),
+        voltage_protection_level=tech_info.get("Impulse Withstand Voltage (U<sub>imp</sub>)"),
+        datasheet_url=get_datasheet_url(certs),
+        # Existing Fields
+        voltage_range_ac=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "AC" in v.upper()],
+        voltage_range_dc=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "DC" in v.upper()],
         current_type=tech_info.get("Current Type"),
         suitable_for_breakers=[add_info.get("Suitable For", "")],
         product_class=add_info.get("Suitable for Product Class"),
         configuration_type=tech_info.get("Configuration Type"),
         is_auto_reset="Auto-Reset" in gen_info.get("Display Name", ""),
         standards=tech_info.get("Standards", []),
+        image_urls=gen_info.get("Images", [])
+    )
+def map_abb_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolator:
+    """
+    Maps ABB Isolator raw JSON to a CanonicalIsolator object, 
+    correctly targeting Electrical and Popular Downloads metadata.
+    """
+    gen_info = raw_data.get("General Information", {})
+    dims = raw_data.get("Dimensions", {})
+    elec = raw_data.get("Electrical", {})
+    downloads = raw_data.get("Popular Downloads", {})
+    
+    # 1. Extract basic identity
+    short_name = gen_info.get("Short Name", "")
+    poles_match = re.search(r'(\d+)P', short_name)
+    current_match = re.search(r'(\d+)A', short_name)
+    
+    # 2. Extract and parse operational voltage
+    # Looks for strings containing "Minimum" or "Maximum" in the Electrical section
+    ops_volt = elec.get("Operational Voltage", [])
+    operational_voltage = {
+        "minimum": next((v.replace("Minimum ", "") for v in ops_volt if "Minimum" in v), None),
+        "maximum": next((v.replace("Maximum ", "") for v in ops_volt if "Maximum" in v), None)
+    }
+    
+    # 3. Extract datasheet from Popular Downloads
+    ds_id = downloads.get("Data Sheet, Technical Information")
+    datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={ds_id}&LanguageCode=en" if ds_id else None
+
+    # 4. Helper for dimensions
+    def parse_dim(key):
+        val = dims.get(key, "0")
+        match = re.search(r'\d+(\.\d+)?', str(val))
+        return float(match.group()) if match else None
+
+    return CanonicalIsolator(
+        sku=gen_info.get("Global ID"),
+        brand="ABB",
+        display_name=gen_info.get("Display Name"),
+        rated_current_a=float(current_match.group(1)) if current_match else None,
+        number_of_poles=int(poles_match.group(1)) if poles_match else None,
+        operational_voltage=operational_voltage,
+        voltage_protection_level=elec.get("Voltage Protection Level ( Up)"),
+        datasheet_url=datasheet_url,
+        width_mm=parse_dim("Product Net Width"),
+        height_mm=parse_dim("Product Net Height"),
+        depth_mm=parse_dim("Product Net Depth / Length"),
+        modular_spacings=int(dims.get("Width in Number of Modular Spacings", 0)),
         image_urls=gen_info.get("Images", [])
     )
