@@ -3,6 +3,8 @@
 from retriever.mappers.AbbMapper import *
 from retriever.mappers.HagerMapper import *
 
+__all__ = ["AbbMapper", "HagerMapper"]
+
 _MAPPER_REGISTRY = {
    ("hager", "isolator"): map_hager_to_canonical_isolator,
    ("abb", "isolator"): map_abb_to_canonical_isolator,

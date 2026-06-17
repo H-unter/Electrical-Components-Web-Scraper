@@ -1,17 +1,19 @@
+import dataclasses
+
 from retriever import HagerScraper, AbbScraper, RittalScraper
 from retriever.mappers import map_to
 from retriever.scrapers.utils import write_json
 
 abb_mccbs_of_interest = [
-   '1SDA067416R1',
-   '1SDA068055R1',
-   '1SDA067417R1',
-   '1SDA068056R1',
-   '1SDA067418R1'
+   'https://new.abb.com/products/1SDA067416R1/xt1n-160-tmd-100-1000-3p-f-f',
+   'https://new.abb.com/products/1SDA068055R1/xt3n-250-tmd-100-1000-3p-f-f',
+   'https://new.abb.com/products/1SDA067417R1/xt1n-160-tmd-125-1250-3p-f-f',
+   'https://new.abb.com/products/1SDA068056R1/xt3n-250-tmd-125-1250-3p-f-f',
+   'https://new.abb.com/products/1SDA067418R1/xt1n-160-tmd-160-1600-3p-f-f'
 ]
 abb_contactors_of_interest = [
-   'AF52400013',
-   'ESB63-22N-06',
+   'https://new.abb.com/products/1SBL367201R1300/af52-40-00-13',
+   'https://new.abb.com/products/1SAE351111R0622/esb63-22n-06',
 ]
 abb_mcbs_of_interest = [
    'https://new.abb.com/products/2CDS273001R0164/s203m-c16',
@@ -40,23 +42,21 @@ hager_contactors_of_interest = [
    'https://hager.com/au/products/product-information/esc080-auxiliary-contact-6a-1no-1nc'
 ]
 hager_mccbs_of_interest = [ # sometimes really annoying due to their sitemap missing things.
-      'HHS100DR',
-      'HNW400JR',
-      'HNJ400DR',
-      'HHS100JR',
-      'HHS160DR'
+   'https://hager.com/au/products/product-information/hhs100dr-mccb-h3-p160-tm-3x100a-25ka',
+   'https://hager.com/au/products/product-information/hnw400jr-mccb-h3-p630-lsi-3x400a-40ka',
+   'https://hager.com/au/products/product-information/hnw400jr-mccb-h3-p630-lsi-3x400a-40ka',
+   'https://hager.com/au/products/product-information/hhs100jr-mccb-h3-p160-lsi-3x100a-25ka',
+   'https://hager.com/au/products/product-information/hhs160dr-mccb-h3-p160-tm-3x160a-25ka'
 ]
 hager_mcbs_of_interest = [
    'https://hager.com/au/products/product-information/hmc199t-mcb-1p-15ka-c-125a-1-5m', # https://hager.com/au/products/product-information/hmc199t-mcb-1p-15ka-c-125a-1-5m
    'https://hager.com/au/products/product-information/msn250-mcb-2p-6ka-c-50a-2m',
    'https://hager.com/au/products/product-information/hmc280t-mcb-2p-15ka-c-80a-3m'
 ]
-
 hager_isolators_of_interest = [
    'https://hager.com/au/products/product-information/sbr180-1p-80a-switch-red-toggle', # switch disconnector, not an isolator
    'https://hager.com/au/products/product-information/jg220in-ip66-20a-2p-isolator'
 ]
-
 hager_spreaders_of_interest = [
    'https://hager.com/au/products/product-information/hya014h-spreader-x160-3p-collar',
    'https://hager.com/au/products/product-information/hyb011h-spreader-x-p250-p250-3p',
@@ -69,24 +69,49 @@ rittal_urls_of_interest = [
     'https://www.rittal.com/au-en/products/PG20231215SCH101/PG20231512SCH301/PRO0023?variantId=1350500'
 ]
 
+TEST_REGISTRY = [
+   ("abb", "mccb", abb_mccbs_of_interest, AbbScraper),
+   ("hager", "mccb", hager_mccbs_of_interest, HagerScraper),
+
+   ("abb", "contactor", abb_contactors_of_interest, AbbScraper),
+   ("hager", "contactor", hager_contactors_of_interest, HagerScraper),
+
+   ("abb", "mcb", abb_mcbs_of_interest, AbbScraper),
+   ("hager", "mcb", hager_mcbs_of_interest, HagerScraper),  
+
+   ("abb", "motor_operator", abb_motor_operators_of_interest, AbbScraper),
+
+   ("abb", "isolator", abb_isolators_of_interest, AbbScraper),
+   ("hager", "isolator", hager_isolators_of_interest, HagerScraper),
+
+   ("abb", "spreader", abb_spreaders_of_interest, AbbScraper),
+   ("hager", "spreader", hager_spreaders_of_interest, HagerScraper),
+]
 
 def main():
-   # for i, product in enumerate(abb_spreaders_of_interest):
-   #    print(f"Processing ABB Spreader: {product}")
-   #    raw_dictionary = AbbScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/abb_spreader_{i}_raw.json")
-   #    canonical_spreader = map_abb_to_canonical_spreader(raw_dictionary)
-   #    write_json(canonical_spreader.to_dict(), f"./output/abb_spreader_{i}_canonical.json")
+   for brand, comp_type, url_list, ScraperClass in TEST_REGISTRY:
+      print(f"\n>>> Starting batch: {brand.upper()} {comp_type.upper()}")
 
-   for i, product in enumerate(hager_spreaders_of_interest):
-      print(f"Processing Hager Spreader: {product}")
-      raw_dictionary = HagerScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/hager_spreader_{i}_raw.json")
-      canonical_spreader = map_to("hager", "spreader", raw_dictionary)
-      write_json(canonical_spreader.to_dict(), f"./output/hager_spreader_{i}_canonical.json")
-
-   # for i, product in enumerate(rittal_urls_of_interest):
-   #    print(f"Processing Rittal Product: {product}")
-   #    raw_dictionary = RittalScraper().return_dictionary_content(url=product, export_json=True, export_path=f"./output/rittal_product_{i}_raw.json")
-   #    write_json(raw_dictionary, f"./output/rittal_product_{i}_raw.json")
+      for i, product_url in enumerate(url_list):
+         print(f"Processing: {product_url}")
+         
+         raw_data = ScraperClass().return_dictionary_content(url=product_url)
+         if not raw_data:
+               print(f"FAILED: Could not fetch {product_url}")
+               continue
+         
+         try:
+               canonical_obj = map_to(brand, comp_type, raw_data)
+               json_data = canonical_obj.to_dict()
+               
+               filename = f"./output/{brand}_{comp_type}_{i}_canonical.json"
+               write_json(json_data, filename)
+               print(f"SUCCESS: Exported {filename}")
+               
+         except NotImplementedError as e:
+               print(f"SKIP: {e}")
+         except Exception as e:
+               print(f"ERROR: Mapping failed for {product_url}: {e}")
 
 if __name__ == "__main__":
     main()

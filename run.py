@@ -1,57 +1,43 @@
-"""CLI entry point: SKU + brand in, CSV out.
-
-Usage
------
-    python run.py HEC041H hager
-    python run.py HEC041H hager --csv
-    python run.py HEC041H hager --csv --out my_output.csv
-    python run.py 1SDA068056R1 abb --csv
-"""
-
 import argparse
 import sys
+import json
+import retriever.scrapers as scrapers
+import retriever.mappers as mappers
 
-from retriever.scrapers.AbbScraper import AbbScraper
-from retriever.scrapers.HagerScraper import HagerScraper
-
-BRANDS: dict = {
-    "abb": AbbScraper,
-    "hager": HagerScraper,
-}
-
+def get_scrapers():
+    return {name.replace("Scraper", "").lower(): getattr(scrapers, name) 
+            for name in scrapers.__all__}
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Scrape a product page by SKU and brand."
-    )
-    parser.add_argument("sku", help="Product SKU (e.g. HEC041H, 1SDA068056R1)")
-    parser.add_argument(
-        "brand",
-        choices=BRANDS.keys(),
-        help="Brand to scrape",
-    )
-    parser.add_argument(
-        "--csv",
-        action="store_true",
-        help="Save output to a CSV file",
-    )
-    parser.add_argument(
-        "--out",
-        metavar="PATH",
-        default=None,
-        help="CSV output path (default: <SKU>.csv)",
-    )
+    SCRAPERS = get_scrapers()
+    
+    parser = argparse.ArgumentParser(description="Scrape and map product data.")
+    parser.add_argument("brand", choices=SCRAPERS.keys(), help="Brand to scrape")
+    parser.add_argument("url", help="Full URL of the product page")
+    parser.add_argument("--canonical", action="store_true", help="Output canonical JSON")
+    parser.add_argument("--type", help="Component type for mapping (e.g., mcb, mccb, isolator)", default="mcb")
+    
     args = parser.parse_args()
 
-    scraper = BRANDS[args.brand]()
-    df = scraper.scrape(args.sku, export_csv=args.csv, csv_path=args.out)
+    # 1. Scrape
+    scraper = SCRAPERS[args.brand]()
+    raw_data = scraper.return_dictionary_content(url=args.url)
 
-    if df is None:
-        print("No data returned — SKU may not exist for this brand.")
+    if raw_data is None:
+        print("No data returned.")
         sys.exit(1)
 
-    print(df.to_string(index=False))
-
+    # 2. Handle Output
+    if args.canonical:
+        try:
+            # Use the existing map_to function from your mappers package
+            canonical_obj = mappers.map_to(args.brand, args.type, raw_data)
+            print(json.dumps(canonical_obj.to_dict(), indent=4))
+        except Exception as e:
+            print(f"Mapping error: {e}")
+            sys.exit(1)
+    else:
+        print(json.dumps(raw_data, indent=4))
 
 if __name__ == "__main__":
     main()
