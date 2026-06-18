@@ -2,8 +2,9 @@
 # The registry: Keys are (brand_name, component_type)
 from retriever.mappers.AbbMapper import *
 from retriever.mappers.HagerMapper import *
+from retriever.mappers.RittalMapper import *
 
-__all__ = ["AbbMapper", "HagerMapper"]
+__all__ = ["AbbMapper", "HagerMapper", "RittalMapper"]
 
 _MAPPER_REGISTRY = {
    ("hager", "isolator"): map_hager_to_canonical_isolator,
@@ -18,6 +19,8 @@ _MAPPER_REGISTRY = {
    ("abb", "motor_operator"): map_abb_to_canonical_motor_operator,
    ("hager", "spreader"): map_hager_to_canonical_spreader,
    ("abb", "spreader"): map_abb_to_canonical_spreader,
+
+   ("rittal", "enclosure"): map_rittal_to_canonical_enclosure,
 }
 
 def map_to(brand: str, component_type: str, raw_data: dict):

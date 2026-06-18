@@ -10,7 +10,6 @@ def get_scrapers():
 
 def main() -> None:
     SCRAPERS = get_scrapers()
-    
     parser = argparse.ArgumentParser(description="Scrape and map product data.")
     parser.add_argument("brand", choices=SCRAPERS.keys(), help="Brand to scrape")
     parser.add_argument("url", help="Full URL of the product page")

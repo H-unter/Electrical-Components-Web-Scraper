@@ -94,7 +94,6 @@ def main():
 
       for i, product_url in enumerate(url_list):
          print(f"Processing: {product_url}")
-         
          raw_data = ScraperClass().return_dictionary_content(url=product_url)
          if not raw_data:
                print(f"FAILED: Could not fetch {product_url}")
@@ -114,4 +113,9 @@ def main():
                print(f"ERROR: Mapping failed for {product_url}: {e}")
 
 if __name__ == "__main__":
-    main()
+    rittal_scraper = RittalScraper()
+    raw_data = rittal_scraper.return_dictionary_content(url=rittal_urls_of_interest[0], export_json=True, export_path="./output/rittal_raw.json")
+    canonical_enclosure = map_to("rittal", "enclosure", raw_data)
+    canonical_dict = canonical_enclosure.to_dict()
+    write_json(canonical_dict, "./output/rittal_canonical.json")
+    

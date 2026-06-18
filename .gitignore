@@ -13,3 +13,4 @@ scraped_outputs.xlsx
 /retriever/mappers/__pycache__
 /retriever/models/__pycache__
 /retriever/scrapers/__pycache__
+*.xlsx
