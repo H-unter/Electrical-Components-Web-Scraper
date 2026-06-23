@@ -1,5 +1,7 @@
 import dataclasses
 
+from typing import Any
+
 from retriever import HagerScraper, AbbScraper, RittalScraper
 from retriever.mappers import map_to
 from retriever.scrapers.utils import write_json
@@ -101,7 +103,7 @@ def main():
                continue
          
          try:
-               canonical_obj = map_to(brand, comp_type, raw_data)
+               canonical_obj: Any = map_to(brand, comp_type, raw_data)
                if not canonical_obj:
                    print(f"FAILED: Could not map {product_url}")
                    continue
@@ -119,7 +121,7 @@ def main():
 def test_rittal():
    rittal_scraper = RittalScraper()
    raw_data = rittal_scraper.return_dictionary_content(url=rittal_urls_of_interest[0], export_json=True, export_path="./output/rittal_raw.json")
-   canonical_enclosure = map_to("rittal", "enclosure", raw_data)
+   canonical_enclosure: Any = map_to("rittal", "enclosure", raw_data)
    canonical_dict = canonical_enclosure.to_dict()
    write_json(canonical_dict, "./output/rittal_canonical.json")
 if __name__ == "__main__":

@@ -25,6 +25,8 @@ def get_html_soup(url: str|None) -> BeautifulSoup | None:
     from bs4 import BeautifulSoup
 
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    if url is None:
+        return None
     try:
         res = requests.get(url, headers=headers, timeout=10)
         res.raise_for_status()
