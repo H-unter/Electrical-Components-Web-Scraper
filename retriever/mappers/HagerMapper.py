@@ -68,24 +68,24 @@ def map_hager_to_canonical_mccb(raw_dictionary: dict|None) -> CanonicalMCCB|None
     u_imp = raw_impulse_voltage / 1000.0 if raw_impulse_voltage > 100.0 else raw_impulse_voltage  # Standardize thousands value string boundary directly down to kV scale units
 
     return CanonicalMCCB(
-        sku=general_info.get("SKU", ""),
-        brand="Hager",
-        display_name=general_info.get("Display Name", ""),
-        poles=int(str(raw_dictionary.get("Architecture", {}).get("Number of poles", "3"))),
-        rated_current_a=_num(electric_current.get("Rated current", "0")),
-        rated_frequency_hz=rated_frequency_hz,
-        u_imp=u_imp,
-        u_insulation=_num(raw_dictionary.get("Voltage", {}).get("Rated insulation voltage Ui", "0")),
-        u_operational=operational_voltage,
-        trip_type=raw_dictionary.get("Functions", {}).get("Trip unit", "TM"),
-        voltage_to_short_circuit_breaking_capacity_ka=short_circuit_breaking_capacity,
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=ultimate_short_circuit_breaking_capacity,
-        height_mm=_num(dimensions.get("Height", "0")),
-        width_mm=_num(dimensions.get("Width", "0")),
-        depth_mm=_num(dimensions.get("Depth", "0")),
-        weight_kg=None,
-        datasheet_url=datasheet_url,
-        image_urls=image_urls
+        m_sku=general_info.get("SKU", ""),
+        m_brand="Hager",
+        m_name=general_info.get("Display Name", ""),
+        m_poles=int(str(raw_dictionary.get("Architecture", {}).get("Number of poles", "3"))),
+        m_i_n=_num(electric_current.get("Rated current", "0")),
+        m_f_n=rated_frequency_hz,
+        m_u_imp=u_imp,
+        m_u_insu=_num(raw_dictionary.get("Voltage", {}).get("Rated insulation voltage Ui", "0")),
+        m_u_n=operational_voltage,
+        m_trip_type=raw_dictionary.get("Functions", {}).get("Trip unit", "TM"),
+        m_i_sc=short_circuit_breaking_capacity,
+        m_i_cu=ultimate_short_circuit_breaking_capacity,
+        m_height_mm=_num(dimensions.get("Height", "0")),
+        m_width_mm=_num(dimensions.get("Width", "0")),
+        m_depth_mm=_num(dimensions.get("Depth", "0")),
+        m_weight_kg=None,
+        datasheet=datasheet_url,
+        img=image_urls
     )
 
 def map_hager_to_canonical_contactor(raw_dictionary: dict | None) -> CanonicalContactor | None:
@@ -160,24 +160,24 @@ def map_hager_to_canonical_contactor(raw_dictionary: dict | None) -> CanonicalCo
         image_urls = [item.get("url") for item in product_images_documents if isinstance(item, dict) and item.get("url")]
 
     return CanonicalContactor(
-        sku=general_info.get("SKU", general_info.get("Display Name", "")),
-        brand="Hager",
-        display_name=general_info.get("Display Name", ""),
-        datasheet_url=datasheet_url,
-        image_urls=image_urls,
-        poles=poles,
-        normally_open_contacts=no_contacts,
-        normally_closed_contacts=nc_contacts,
-        rated_current_a=rated_current if rated_current > 0 else None,
-        voltage_to_rated_ac1_current_a=ac1_currents,
-        voltage_to_rated_ac3_current_a={},
-        operational_voltage_v=operational_voltage,
-        insulation_voltage_v=insulation_voltage,
-        impulse_withstand_voltage_v=impulse_withstand_voltage,
-        height_mm=_num(dimensions.get("Height", "0")),
-        width_mm=_num(dimensions.get("Width", "0")),
-        depth_mm=_num(dimensions.get("Depth", "0")),
-        weight_kg=None
+        m_sku=general_info.get("SKU", general_info.get("Display Name", "")),
+        m_brand="Hager",
+        m_display_name=general_info.get("Display Name", ""),
+        datasheet=datasheet_url,
+        img=image_urls,
+        m_poles=poles,
+        m_no_contacts=no_contacts,
+        m_nc_contacts=nc_contacts,
+        m_i_n=rated_current if rated_current > 0 else None,
+        m_i_ac1=ac1_currents,
+        m_i_ac3={},
+        m_u_n=operational_voltage,
+        m_u_insu=insulation_voltage,
+        m_u_imp=impulse_withstand_voltage,
+        m_height_mm=_num(dimensions.get("Height", "0")),
+        m_width_mm=_num(dimensions.get("Width", "0")),
+        m_depth_mm=_num(dimensions.get("Depth", "0")),
+        m_weight_kg=None
     )
 
 def map_hager_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None:
@@ -286,22 +286,22 @@ def map_hager_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | No
         image_urls = [item.get("url") for item in product_images_documents if isinstance(item, dict) and item.get("url")]
 
     return CanonicalMCB(
-        sku=sku,
-        brand="Hager",
-        display_name=display_name,
-        poles=poles,
-        protected_poles=protected_poles,
-        rated_current_a=rated_current,
-        tripping_characteristic=tripping_characteristic,
-        voltage_to_service_short_circuit_breaking_capacity_ka=icn_dict,
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
-        height_mm=height,
-        width_mm=width,
-        depth_mm=depth,
-        datasheet_url=datasheet_url,
-        image_urls=image_urls if image_urls else None,
-        rated_frequency_hz=rated_frequency,
-        weight_kg=None
+        m_sku=sku,
+        m_brand="Hager",
+        m_name=display_name,
+        m_poles=poles,
+        m_protected_poles=protected_poles,
+        m_i_n=rated_current,
+        m_trip_class=tripping_characteristic,
+        m_i_sc=icn_dict,
+        m_i_cu=icu_dict,
+        m_height_mm=height,
+        m_width_mm=width,
+        m_depth_mm=depth,
+        datasheet=datasheet_url,
+        img=image_urls if image_urls else None,
+        m_f_n=rated_frequency,
+        m_weight_kg=None
     )
 
 
@@ -324,22 +324,22 @@ def map_hager_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolat
         return float(match.group()) if match else None
 
     return CanonicalIsolator(
-        sku=gen_info.get("SKU"),
-        brand="Hager",
-        display_name=gen_info.get("Display Name"),
-        rated_current_a=parse_float(elec.get("Rated current")),
-        number_of_poles=int(arch.get("Number of poles", 0)),
+        m_sku=gen_info.get("SKU"),
+        m_brand="Hager",
+        m_name=gen_info.get("Display Name"),
+        m_i_n=parse_float(elec.get("Rated current")),
+        m_poles=int(arch.get("Number of poles", 0)),
         # Mapping Hager's "Rated operational voltage Ue" to canonical structure
-        operational_voltage={
+        m_u_n={
             "minimum": volt.get("Rated operational voltage Ue", "N/A").split("-")[0].strip(),
             "maximum": volt.get("Rated operational voltage Ue", "N/A").split("-")[-1].strip()
         },
-        voltage_protection_level=None, # Hager structure differs; check "Rated insulation voltage Ui"
-        datasheet_url=gen_info.get("Product URL"),
-        width_mm=parse_float(dims.get("Width")),
-        height_mm=parse_float(dims.get("Height")),
-        depth_mm=parse_float(dims.get("Depth")),
-        image_urls=[gen_info.get("Images")] if gen_info.get("Images") else []
+        m_u_prot=None, # Hager structure differs; check "Rated insulation voltage Ui"
+        datasheet=gen_info.get("Product URL"),
+        m_width_mm=parse_float(dims.get("Width")),
+        m_height_mm=parse_float(dims.get("Height")),
+        m_depth_mm=parse_float(dims.get("Depth")),
+        img=[gen_info.get("Images")] if gen_info.get("Images") else []
     )
 
 
@@ -363,19 +363,19 @@ def map_hager_to_canonical_spreader(raw_dictionary: dict) -> CanonicalSpreader:
     arch = raw_dictionary.get("Architecture", {})
 
     return CanonicalSpreader(
-        sku=gen.get("SKU"),
-        brand="Hager",
-        display_name=gen.get("Display Name"),
-        description=gen.get("Description"),
+        m_sku=gen.get("SKU"),
+        m_brand="Hager",
+        m_name=gen.get("Display Name"),
+        m_description=gen.get("Description"),
         # Added new fields
-        categories=[gen.get("Category 1"), gen.get("Category 2"), gen.get("Category 3")],
-        rated_current=elec.get("Rated current"),
-        number_of_poles=arch.get("Type of pole"), # "3P"
+        m_categories=[gen.get("Category 1"), gen.get("Category 2"), gen.get("Category 3")],
+        m_i_n=elec.get("Rated current"),
+        m_poles=arch.get("Type of pole"), # "3P"
         # Existing fields
-        suitable_for=raw_dictionary.get("Compatible Products", []),
-        image_urls=[gen.get("Images")] if gen.get("Images") else [],
-        datasheet_url=None, # Update if scraping logic is added
-        weight_kg=None,
-        configuration_type=None,
-        order_multiple=None
+        m_suitable_for=raw_dictionary.get("Compatible Products", []),
+        img=[gen.get("Images")] if gen.get("Images") else [],
+        datasheet=None, # Update if scraping logic is added
+        m_weight_kg=None,
+        m_config_type=None,
+        m_order_multiple=None
     )

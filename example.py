@@ -41,7 +41,8 @@ hager_contactors_of_interest = [
    'https://hager.com/au/products/product-information/esc227-contactor-25a-1no-1nc-230v',
    'https://hager.com/au/products/product-information/esc080-auxiliary-contact-6a-1no-1nc'
 ]
-hager_mccbs_of_interest = [ # sometimes really annoying due to their sitemap missing things.
+hager_mccbs_of_interest = [
+   'https://hager.com/au/products/product-information/hec041h-mccb-h250-4p-70ka-40a-lsi', # sometimes really annoying due to their sitemap missing things.
    'https://hager.com/au/products/product-information/hhs100dr-mccb-h3-p160-tm-3x100a-25ka',
    'https://hager.com/au/products/product-information/hnw400jr-mccb-h3-p630-lsi-3x400a-40ka',
    'https://hager.com/au/products/product-information/hnw400jr-mccb-h3-p630-lsi-3x400a-40ka',
@@ -101,6 +102,9 @@ def main():
          
          try:
                canonical_obj = map_to(brand, comp_type, raw_data)
+               if not canonical_obj:
+                   print(f"FAILED: Could not map {product_url}")
+                   continue
                json_data = canonical_obj.to_dict()
                
                filename = f"./output/{brand}_{comp_type}_{i}_canonical.json"
@@ -112,10 +116,13 @@ def main():
          except Exception as e:
                print(f"ERROR: Mapping failed for {product_url}: {e}")
 
+def test_rittal():
+   rittal_scraper = RittalScraper()
+   raw_data = rittal_scraper.return_dictionary_content(url=rittal_urls_of_interest[0], export_json=True, export_path="./output/rittal_raw.json")
+   canonical_enclosure = map_to("rittal", "enclosure", raw_data)
+   canonical_dict = canonical_enclosure.to_dict()
+   write_json(canonical_dict, "./output/rittal_canonical.json")
 if __name__ == "__main__":
-    rittal_scraper = RittalScraper()
-    raw_data = rittal_scraper.return_dictionary_content(url=rittal_urls_of_interest[0], export_json=True, export_path="./output/rittal_raw.json")
-    canonical_enclosure = map_to("rittal", "enclosure", raw_data)
-    canonical_dict = canonical_enclosure.to_dict()
-    write_json(canonical_dict, "./output/rittal_canonical.json")
+    main()
+    
     

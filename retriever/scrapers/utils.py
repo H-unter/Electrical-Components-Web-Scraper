@@ -1,6 +1,8 @@
 import json
 import os
 
+from bs4 import BeautifulSoup
+
 
 def clean_text(text: str) -> str:
     """Strips soft hyphens and normalises whitespace."""
@@ -17,7 +19,7 @@ def write_json(data, filepath) -> None:
         print(f"Failed to write JSON: {e}")
 
 
-def get_html_soup(url: str):
+def get_html_soup(url: str|None) -> BeautifulSoup | None:
     """Fetches a URL and returns a BeautifulSoup object, or None on failure."""
     import requests
     from bs4 import BeautifulSoup

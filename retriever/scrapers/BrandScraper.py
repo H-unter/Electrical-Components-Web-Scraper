@@ -7,7 +7,7 @@ from retriever.scrapers.utils import write_json, get_html_soup
 class BrandScraper(ABC):
     """Abstract base class for all brand-specific scrapers."""
 
-    def return_html_content(self, url: str) -> BeautifulSoup | None:
+    def return_html_content(self, url: str| None) -> BeautifulSoup | None:
         """
         Fetches the raw HTML data for a given URL.
         Returns a BeautifulSoup object.

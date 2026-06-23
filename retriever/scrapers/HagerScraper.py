@@ -4,10 +4,6 @@ import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from typing import Optional, Dict, Any
-
-from retriever.models import CanonicalSpreader
-
 from .BrandScraper import BrandScraper
 from .utils import clean_text, write_json
 
@@ -125,7 +121,7 @@ class HagerScraper(BrandScraper):
                     specs.setdefault(current_group, {})[clean_text(lbl.text)] = clean_text(dat.text)
         return {g: attrs for g, attrs in specs.items() if attrs}
 
-    def _extract_documents(self, soup: BeautifulSoup) -> dict:
+    def _extract_documents(self, soup: BeautifulSoup) -> dict | None:
         """Parses the Downloads section into a dict keyed by document category."""
         documents = {}
         for li in soup.select(".product-documents__table li"):
@@ -147,4 +143,4 @@ class HagerScraper(BrandScraper):
                 "file_type":   clean_text(ext_el.text)   if ext_el   else "",
                 "file_size":   clean_text(size_el.text)  if size_el  else "",
             })
-            return documents
+        return documents if documents else None

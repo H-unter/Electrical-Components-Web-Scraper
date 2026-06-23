@@ -36,26 +36,26 @@ def map_rittal_to_canonical_enclosure(raw_data: dict) -> CanonicalEnclosure:
         }
 
     return CanonicalEnclosure(
-        sku=raw_data.get("article_no", "").replace("AE ", ""),
-        brand="Rittal",
-        display_name=raw_data.get("title"),
-        width_mm=dims.get("width"),
-        height_mm=dims.get("height"),
-        depth_mm=dims.get("depth"),
-        material=raw_data.get("Basic material"),
-        ip_rating=raw_data.get("Protection category to IEC 60 529"),
-        description=raw_data.get("description"),
-        colour=raw_data.get("Colour"),
-        surface_finish={
-            "description": raw_data.get("Surface finish")
+        m_sku=raw_data.get("article_no", "").replace("AE ", ""),
+        m_brand="Rittal",
+        m_name=raw_data.get("title"),
+        m_width_mm=dims.get("width"),
+        m_height_mm=dims.get("height"),
+        m_depth_mm=dims.get("depth"),
+        m_material=raw_data.get("Basic material"),
+        m_ip_rating=raw_data.get("Protection category to IEC 60 529"),
+        m_description=raw_data.get("description"),
+        m_colour=raw_data.get("Colour"),
+        m_surface_finish={
+            "description": raw_data.get("Surface finish") or ""
         },
-        supply_includes=items,
-        material_thickness_mm={
+        m_supply_includes=items,
+        m_material_thickness_mm={
             "door": _parse_thickness(raw_data.get("Material thickness - door", "0")),
             "enclosure": _parse_thickness(raw_data.get("Material thickness - enclosure", "0")),
             "mounting_plate": _parse_thickness(raw_data.get("Material thickness of mounting plate", "0")),
         },
-        mounting_plate_dimensions_mm=mp_dims,
-        number_of_doors=int(raw_data.get("Number of doors", 0)),
-        weight_kg=float(raw_data.get("Gross weight", "0").replace(" kg", ""))
+        m_mounting_plate_dimensions_mm=mp_dims,
+        m_door_count=int(raw_data.get("Number of doors", 0)),
+        m_weight_kg=float(raw_data.get("Gross weight", "0").replace(" kg", ""))
     )

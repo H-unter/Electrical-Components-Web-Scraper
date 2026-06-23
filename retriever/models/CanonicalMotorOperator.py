@@ -4,27 +4,28 @@ from typing import Any, List, Dict, Optional
 @dataclass
 class CanonicalMotorOperator:
     """A unified data structure representing a Motor Operator."""
-    sku: str
-    brand: str
-    display_name: str
-    description: Optional[str] = None
-    ean: Optional[str] = None
+    m_sku: str
+    m_brand: str
+    m_name: str
+    m_description: Optional[str] = None
+    ean: Optional[str] = None # TODO: remove
     
-    # Updated: Stores structured voltage data
-    voltage_range_ac: List[Dict[str, Any]] = field(default_factory=list) 
-    voltage_range_dc: List[Dict[str, Any]] = field(default_factory=list)
-    operational_voltage: Dict[str, Optional[str]] = field(default_factory=lambda: {"minimum": None, "maximum": None})
-    voltage_protection_level: Optional[str] = None
-    datasheet_url: Optional[str] = None
-    current_type: Optional[str] = None
-    suitable_for_breakers: List[str] = field(default_factory=list)
-    product_class: Optional[str] = None
-    configuration_type: Optional[str] = None
-    is_auto_reset: bool = False
-    standards: List[str] = field(default_factory=list)
-    etim_class: Optional[str] = None
-    image_urls: List[str] = field(default_factory=list)
-    document_urls: List[str] = field(default_factory=list)
+    m_u_ac_range: List[Dict[str, Any]] = field(default_factory=list) 
+    m_u_dc_range: List[Dict[str, Any]] = field(default_factory=list)
+    m_u_n: Dict[str, Optional[str]] = field(default_factory=lambda: {"minimum": None, "maximum": None})
+    m_u_prot: Optional[str] = None
+    datasheet: Optional[str] = None
+    m_current_type: Optional[str] = None
+    m_suitable_for: List[str] = field(default_factory=list)
+    m_product_class: Optional[str] = None
+    m_config_type: Optional[str] = None
+    m_is_auto_reset: bool = False
+    m_standards: List[str] = field(default_factory=list)
+    m_etim_class: Optional[str] = None
+    img: List[str] = field(default_factory=list)
+    m_document_urls: List[str] = field(default_factory=list)
+
+    m_type: str = "motor_operator"
 
     def to_dict(self) -> dict:
         return asdict(self)

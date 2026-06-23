@@ -1,15 +1,66 @@
-
-
-from retriever.models.CanonicalMCCB import CanonicalMCCB
-from retriever.models.CanonicalMCB import CanonicalMCB
+import re
+from typing import Any, Dict, List, Optional
 from retriever.models.CanonicalContactor import CanonicalContactor
-from retriever.models.CanonicalMotorOperator import CanonicalMotorOperator
 from retriever.models.CanonicalIsolator import CanonicalIsolator
+from retriever.models.CanonicalMCB import CanonicalMCB
+from retriever.models.CanonicalMCCB import CanonicalMCCB
+from retriever.models.CanonicalMotorOperator import CanonicalMotorOperator
 from retriever.models.CanonicalSpreader import CanonicalSpreader
 
-from typing import Optional, Dict, List, Any
+# ==============================================================================
+# SHARED UTILITY FUNCTIONS
+# ==============================================================================
 
-import re
+def _to_float(val: Any) -> float:
+    """Extracts a clean float from a string, list, or numeric value."""
+    if not val:
+        return 0.0
+    s = val[0] if isinstance(val, list) and val else val
+    cleaned = re.sub(r"[^\d.]", "", str(s).replace(",", "."))
+    return float(cleaned) if cleaned and cleaned != "." else 0.0
+
+
+def _build_datasheet_url(doc_id: Any) -> Optional[str]:
+    """Constructs a standardized ABB datasheet URL from a document ID/list."""
+    actual_id = doc_id[0] if isinstance(doc_id, list) and doc_id else doc_id
+    if not actual_id:
+        return None
+    return f"https://search.abb.com/library/Download.aspx?DocumentID={actual_id}&LanguageCode=en&DocumentPartId=&Action=Launch"
+
+
+def _normalize_images(images_val: Any) -> List[str]:
+    """Normalizes image data structures (strings, lists, dicts) into valid URLs."""
+    if not images_val:
+        return []
+    raw_list = images_val if isinstance(images_val, list) else [images_val]
+    urls = []
+    for img in raw_list:
+        url = img if isinstance(img, str) else (img.get("PublicUrl") or img.get("Url", ""))
+        if url:
+            if url.startswith("//"):
+                url = "https:" + url
+            urls.append(url)
+    return urls
+
+
+def _find_val(d: dict, pattern: str) -> Any:
+    """Finds a value in a dictionary where the key contains the given pattern."""
+    return next((v for k, v in d.items() if pattern in k), None)
+
+
+def _parse_capacity(raw_val: Any) -> Dict[str, float]:
+    """Parses short-circuit breaking capacity text into a structured mapping."""
+    lines = raw_val if isinstance(raw_val, list) else ([raw_val] if raw_val else [])
+    pairs = [
+        re.search(r"\((.*?)\)\s*([\d.]+)", str(line))
+        for line in lines if "(" in str(line)
+    ]
+    return {m.group(1).replace(" ", ""): float(m.group(2)) for m in pairs if m}
+
+
+# ==============================================================================
+# MAPPER FUNCTIONS
+# ==============================================================================
 
 def map_abb_to_canonical_mccb(raw: dict | None) -> CanonicalMCCB | None:
     """Transforms raw parsed ABB dictionary structures into a CanonicalMCCB instance."""
@@ -20,85 +71,41 @@ def map_abb_to_canonical_mccb(raw: dict | None) -> CanonicalMCCB | None:
     dims  = raw.get("Dimensions", {})
     certs = raw.get("Certificates and Declarations", {})
 
-    def _num(val) -> float:
-        s = val[0] if isinstance(val, list) and val else val
-        return float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
-
-    def _find_val(d: dict, pattern: str):
-        return next((v for k, v in d.items() if pattern in k), None)
-
-    def _parse_capacity(raw_val) -> dict[str, float]:
-        lines = raw_val if isinstance(raw_val, list) else ([raw_val] if raw_val else [])
-        pairs = [
-            re.search(r"\((.*?)\)\s*([\d.]+)", str(line))
-            for line in lines if "(" in str(line)
-        ]
-        return {m.group(1).replace(" ", ""): float(m.group(2)) for m in pairs if m}
-
     freq_str = tech.get("Rated Frequency (f)", "50 / 60 Hz")
     freq = (
         [float(x) for x in re.findall(r"\d+", str(freq_str))]
         if "/" in str(freq_str) or "-" in str(freq_str)
-        else _num(freq_str)
+        else _to_float(freq_str)
     )
 
     u_op_str   = _find_val(tech, "Rated Operational Voltage") or ""
     u_op_clean = u_op_str[0] if isinstance(u_op_str, list) and u_op_str else u_op_str
-    u_op = (
-        _num(str(u_op_clean).split("V AC")[0])
-        if "V AC" in str(u_op_clean)
-        else _num(u_op_clean)
-    )
-
-    doc_list = certs.get("Data Sheet, Technical Information", [])
-    doc_id   = doc_list[0] if isinstance(doc_list, list) and doc_list else None
+    u_op = _to_float(str(u_op_clean).split("V AC")[0]) if "V AC" in str(u_op_clean) else _to_float(u_op_clean)
 
     return CanonicalMCCB(
-        sku=gen.get("Global ID", ""),
-        brand="ABB",
-        display_name=gen.get("Display Name", ""),
-        datasheet_url=(
-            f"https://search.abb.com/library/Download.aspx?DocumentID={doc_id}"
-            f"&LanguageCode=en&DocumentPartId=&Action=Launch"
-            if doc_id else None
-        ),
-        image_urls=gen.get("Images", []) if isinstance(gen.get("Images"), list) else [],
-        poles=int(str(_find_val(tech, "Number of Poles") or "3").replace("P", "")),
-        rated_current_a=_num(_find_val(tech, "Rated Current")),
-        rated_frequency_hz=freq,
-        u_imp=_num(_find_val(tech, "Rated Impulse Withstand")),
-        u_insulation=_num(_find_val(tech, "Rated Insulation Voltage")),
-        u_operational=u_op,
-        trip_type=tech.get("Release Type", "TM"),
-        voltage_to_short_circuit_breaking_capacity_ka=_parse_capacity(
-            _find_val(tech, "Rated Service Short-Circuit")
-        ),
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=_parse_capacity(
-            _find_val(tech, "Rated Ultimate Short-Circuit")
-        ),
-        height_mm=_num(dims.get("Product Net Height", "0")),
-        width_mm=_num(dims.get("Product Net Width", "0")),
-        depth_mm=_num(dims.get("Product Net Depth / Length", "0")),
-        weight_kg=_num(dims.get("Product Net Weight", "0")) or None,
+        m_sku=gen.get("Global ID", ""),
+        m_brand="ABB",
+        m_name=gen.get("Display Name", ""),
+        datasheet=_build_datasheet_url(certs.get("Data Sheet, Technical Information")),
+        img=_normalize_images(gen.get("Images")),
+        m_poles=int(str(_find_val(tech, "Number of Poles") or "3").replace("P", "")),
+        m_i_n=_to_float(_find_val(tech, "Rated Current")),
+        m_f_n=freq,
+        m_u_imp=_to_float(_find_val(tech, "Rated Impulse Withstand")),
+        m_u_insu=_to_float(_find_val(tech, "Rated Insulation Voltage")),
+        m_u_n=u_op,
+        m_trip_type=tech.get("Release Type", "TM"),
+        m_i_sc=_parse_capacity(_find_val(tech, "Rated Service Short-Circuit")),
+        m_i_cu=_parse_capacity(_find_val(tech, "Rated Ultimate Short-Circuit")),
+        m_height_mm=_to_float(dims.get("Product Net Height", "0")),
+        m_width_mm=_to_float(dims.get("Product Net Width", "0")),
+        m_depth_mm=_to_float(dims.get("Product Net Depth / Length", "0")),
+        m_weight_kg=_to_float(dims.get("Product Net Weight", "0")) or None,
     )
 
 
 def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | None:
-    """Transforms a raw parsed ABB contactor dictionary into a CanonicalContactor instance.
-
-    Handles both power contactors (AF series, e.g. AF52-40-00-13) and
-    installation contactors (ESB series, e.g. ESB63-22N-06), whose field
-    shapes differ in several places:
-
-    - operational_voltage: AF series → single string "Main Circuit 690 V";
-      ESB series → list including DC entries — AC maximum is taken.
-    - insulation_voltage: may be a list of IEC/UL values — IEC value preferred.
-    - impulse_withstand_voltage: stored as "6 kV" — converted to 6000 V.
-    - AC-1/AC-3 current maps: AF series keyed by voltage+temperature rows;
-      ESB series keyed by contact type (NO/NC) or voltage. Highest amperage
-      wins when multiple rows share the same voltage key.
-    - datasheet ID lives in 'Popular Downloads', not 'Certificates'.
-    """
+    """Transforms a raw parsed ABB contactor dictionary into a CanonicalContactor instance."""
     if not raw:
         return None
 
@@ -107,16 +114,7 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
     dims = raw.get("Dimensions", {})
     docs = raw.get("Popular Downloads", {})
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-
-    def _num(val) -> float:
-        s = val[0] if isinstance(val, list) and val else val
-        return float(re.sub(r"[^\d.]", "", str(s).replace(",", "."))) if s else 0.0
-
     def _parse_operational_voltage(raw_val) -> int:
-        """Return the highest AC voltage found; DC entries are ignored."""
         lines = raw_val if isinstance(raw_val, list) else [raw_val]
         best = 0
         for line in lines:
@@ -128,7 +126,6 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
         return best
 
     def _parse_insulation_voltage(raw_val) -> int:
-        """Return IEC-rated insulation voltage; fall back to first numeric value."""
         lines = raw_val if isinstance(raw_val, list) else [raw_val]
         iec_val, first_val = None, None
         for line in lines:
@@ -143,7 +140,6 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
         return iec_val or first_val or 0
 
     def _parse_impulse_voltage(raw_val) -> int:
-        """Convert '6 kV' → 6000 or '6000 V' → 6000."""
         m = re.search(r"([\d.]+)\s*(kV|V)", str(raw_val), re.IGNORECASE)
         if m:
             val = float(m.group(1))
@@ -151,13 +147,6 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
         return 0
 
     def _parse_current_map(raw_val) -> dict[str, float]:
-        """Parse AC current entries into a {key: amps} dict.
-
-        Voltage+temperature rows like '(690 V) 40 °C 100 A' → {'690V@40C': 100.0}
-        Slash-voltage rows '(380 / 400 V) 60 °C 53 A'       → {'400V@60C': 53.0}
-        Voltage-only rows '(230 V) Single Phase, NO 30 A'    → {'230V': 30.0}
-        Contact-type rows '(NO) 63 A'                        → {'NO': 63.0}
-        """
         lines = raw_val if isinstance(raw_val, list) else ([raw_val] if raw_val else [])
         result: dict[str, float] = {}
         for line in lines:
@@ -172,90 +161,60 @@ def map_abb_to_canonical_contactor(raw: dict | None) -> CanonicalContactor | Non
             key_raw = parens.group(1).strip()
             if re.search(r"\d+\s*V", key_raw):
                 voltages    = re.findall(r"(\d+)\s*V", key_raw)
-                voltage_key = voltages[-1] + "V"          # last voltage in slash list
+                voltage_key = voltages[-1] + "V"
                 temp_m      = re.search(r"(\d+)\s*°C", s)
                 key         = f"{voltage_key}@{temp_m.group(1)}C" if temp_m else voltage_key
             else:
-                key = key_raw                             # e.g. 'NO', 'NC'
+                key = key_raw
             result[key] = amps
         return result
-
-    # ------------------------------------------------------------------
-    # Field extraction
-    # ------------------------------------------------------------------
-
-    doc_id       = docs.get("Data Sheet, Technical Information")
-    datasheet_url = (
-        f"https://search.abb.com/library/Download.aspx?DocumentID={doc_id}"
-        f"&LanguageCode=en&DocumentPartId=&Action=Launch"
-        if doc_id else None
-    )
-
-    images_raw = gen.get("Images", "")
-    image_urls = images_raw if isinstance(images_raw, list) else ([images_raw] if images_raw else [])
 
     poles_raw = str(tech.get("Number of Poles", "4")).replace("P", "").strip()
     poles     = int(poles_raw) if poles_raw.isdigit() else 4
 
     return CanonicalContactor(
-        sku=gen.get("Global ID", ""),
-        brand="ABB",
-        display_name=gen.get("Display Name", ""),
-        datasheet_url=datasheet_url,
-        image_urls=image_urls,
-        poles=poles,
-        normally_open_contacts=int(_num(tech.get("Number of Main Contacts NO", "0"))),
-        normally_closed_contacts=int(_num(tech.get("Number of Main Contacts NC", "0"))),
-        voltage_to_rated_ac1_current_a=_parse_current_map(
-            tech.get("Rated Operational Current AC-1 (I<sub>e</sub>)", [])
-        ),
-        voltage_to_rated_ac3_current_a=_parse_current_map(
-            tech.get("Rated Operational Current AC-3 (I<sub>e</sub>)", [])
-        ),
-        operational_voltage_v=_parse_operational_voltage(
-            tech.get("Rated Operational Voltage", "0")
-        ),
-        insulation_voltage_v=_parse_insulation_voltage(
-            tech.get("Rated Insulation Voltage (U<sub>i</sub>)", "0")
-        ),
-        impulse_withstand_voltage_v=_parse_impulse_voltage(
-            tech.get("Rated Impulse Withstand Voltage (U<sub>imp</sub>)", "0")
-        ),
-        height_mm=_num(dims.get("Product Net Height", "0")),
-        width_mm=_num(dims.get("Product Net Width", "0")),
-        depth_mm=_num(dims.get("Product Net Depth / Length", "0")),
-        weight_kg=_num(dims.get("Product Net Weight", "0")) or None,
+        m_sku=gen.get("Global ID", ""),
+        m_brand="ABB",
+        m_display_name=gen.get("Display Name", ""),
+        datasheet=_build_datasheet_url(docs.get("Data Sheet, Technical Information")),
+        img=_normalize_images(gen.get("Images")),
+        m_poles=poles,
+        m_no_contacts=int(_to_float(tech.get("Number of Main Contacts NO", "0"))),
+        m_nc_contacts=int(_to_float(tech.get("Number of Main Contacts NC", "0"))),
+        m_i_ac1=_parse_current_map(tech.get("Rated Operational Current AC-1 (I<sub>e</sub>)", [])),
+        m_i_ac3=_parse_current_map(tech.get("Rated Operational Current AC-3 (I<sub>e</sub>)", [])),
+        m_u_n=_parse_operational_voltage(tech.get("Rated Operational Voltage", "0")),
+        m_u_insu=_parse_insulation_voltage(tech.get("Rated Insulation Voltage (U<sub>i</sub>)", "0")),
+        m_u_imp=_parse_impulse_voltage(tech.get("Rated Impulse Withstand Voltage (U<sub>imp</sub>)", "0")),
+        m_height_mm=_to_float(dims.get("Product Net Height", "0")),
+        m_width_mm=_to_float(dims.get("Product Net Width", "0")),
+        m_depth_mm=_to_float(dims.get("Product Net Depth / Length", "0")),
+        m_weight_kg=_to_float(dims.get("Product Net Weight", "0")) or None,
     )
+
 
 def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None:
     """Transforms raw parsed ABB product JSON into a CanonicalMCB instance."""
     if not raw_dictionary:
         return None
 
-    # ABB data can either be nested inside a 'ProductViewModel' or already flattened into categories.
     attr_map = {}
     pvm = raw_dictionary.get("ProductViewModel", {})
     groups = pvm.get("Groups", []) if pvm else raw_dictionary.get("Groups", [])
 
     if not groups:
-        # If the data was already scraped and grouped by AbbScraper.extract_product_info
         for category, attrs in raw_dictionary.items():
             if isinstance(attrs, dict):
                 for k, v in attrs.items():
-                    clean_k = re.sub(r'<[^>]+>', '', k).strip() # Strip HTML like <sub>n</sub>
+                    clean_k = re.sub(r'<[^>]+>', '', k).strip()
                     attr_map[clean_k] = v
     else:
-        # If raw JSON from the ViewModel API
         for group in groups:
             for attr in group.get("Attributes", []):
-                name = attr.get("Name", "")
-                value = attr.get("Value", "")
-                clean_name = re.sub(r'<[^>]+>', '', name).strip()
-                attr_map[clean_name] = value
+                clean_name = re.sub(r'<[^>]+>', '', attr.get("Name", "")).strip()
+                attr_map[clean_name] = attr.get("Value", "")
 
-    # --- Helpers ---
     def _extract_string(key: str) -> str:
-        # Looks for exact matches first, then falls back to partial matches
         if key in attr_map:
             return str(attr_map[key])
         for k, v in attr_map.items():
@@ -263,23 +222,9 @@ def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None
                 return str(v)
         return ""
 
-    def _float(val: str) -> float:
-        if not val: return 0.0
-        cleaned = re.search(r"([\d.,]+)", val)
-        if cleaned:
-            return float(cleaned.group(1).replace(",", "."))
-        return 0.0
-
-    def _int(val: str) -> int:
-        if not val: return 0
-        cleaned = re.search(r"(\d+)", val)
-        return int(cleaned.group(1)) if cleaned else 0
-
-    def _parse_capacity(val: str) -> dict[str, float]:
-        """Parses strings like '(230 V AC) 10 kA' or '["(AC) 6 kA", "(400 V AC) 6 kA"]' into a dict."""
+    def _parse_mcb_capacity(val: str) -> dict[str, float]:
         caps = {}
         if not val: return caps
-        
         matches = re.finditer(r"\((.*?)\)\s*([\d.,]+)\s*kA", val)
         found_specific_voltage = False
         generic_caps = {}
@@ -287,26 +232,18 @@ def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None
         for m in matches:
             voltage_str = m.group(1).strip()
             ka_val = float(m.group(2).replace(',', '.'))
-            
-            # Check if the parenthesis actually contains numbers (e.g., "400 V AC")
             if any(char.isdigit() for char in voltage_str):
                 caps[voltage_str] = ka_val
                 found_specific_voltage = True
             else:
-                # Store non-voltage qualifiers (like "AC" or "DC") temporarily
                 generic_caps[f"Default {voltage_str}"] = ka_val
                 
-        # If specific voltages were found, ignore the generics to keep the keys clean.
-        # If NO specific voltages were found, append the generic ones (e.g., "Default AC")
         if not found_specific_voltage and generic_caps:
             caps.update(generic_caps)
-            
-        # Fallback if no parenthesis format was used at all (e.g., just "10 kA")
         if not caps and not generic_caps:
             fallback = re.search(r"([\d.,]+)\s*kA", val)
             if fallback:
                 caps["Default"] = float(fallback.group(1).replace(',', '.'))
-                
         return caps
 
     def _parse_frequency(val: str) -> Optional[float | list[float]]:
@@ -316,90 +253,59 @@ def map_abb_to_canonical_mcb(raw_dictionary: dict | None) -> CanonicalMCB | None
         if not floats: return None
         return floats[0] if len(floats) == 1 else floats
 
-    # --- Core Properties ---
     display_name = raw_dictionary.get("DisplayName") or attr_map.get("Display Name", attr_map.get("Product ID", ""))
     sku = attr_map.get("Global ID", attr_map.get("Order Code", attr_map.get("Product ID", display_name)))
     
-    # --- Images ---
-    image_urls = []
-    if pvm and "Images" in pvm:
-        for img in pvm["Images"]:
-            url = img.get("PublicUrl") or img.get("Url", "")
-            if url:
-                if url.startswith("//"): url = "https:" + url
-                image_urls.append(url)
-    else:
-        images_val = attr_map.get("Images", [])
-        if isinstance(images_val, list):
-            for img in images_val:
-                url = img if isinstance(img, str) else img.get("PublicUrl", img.get("Url", ""))
-                if url:
-                    if url.startswith("//"): url = "https:" + url
-                    image_urls.append(url)
+    # Unified Image Extraction Block
+    image_source = pvm.get("Images") if pvm else attr_map.get("Images", [])
+    image_urls = _normalize_images(image_source)
 
-    # --- Documents ---
-    doc_id = attr_map.get("Data Sheet, Technical Information")
-    if doc_id:
-        datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={doc_id}&LanguageCode=en&DocumentPartId=&Action=Launch"
-    else:
-        product_id = attr_map.get("Product ID", sku)
-        datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={product_id}&LanguageCode=en&DocumentPartId=&Action=Launch" if product_id else None
+    doc_id = attr_map.get("Data Sheet, Technical Information") or attr_map.get("Product ID", sku)
+    datasheet_url = _build_datasheet_url(doc_id)
 
-    # --- Capacities (with Ics -> Icn fallback) ---
     ics_str = _extract_string("Rated Service Short-Circuit Breaking Capacity")
     icn_str = _extract_string("Rated Short-Circuit Capacity")
     icu_str = _extract_string("Rated Ultimate Short-Circuit Breaking Capacity")
 
-    # Parse Ics first. If the dictionary is empty (meaning no Ics data exists), parse Icn instead.
-    ics_dict = _parse_capacity(ics_str)
-    if not ics_dict:
-        ics_dict = _parse_capacity(icn_str)
-        
-    icu_dict = _parse_capacity(icu_str)
+    ics_dict = _parse_mcb_capacity(ics_str) or _parse_mcb_capacity(icn_str)
+    icu_dict = _parse_mcb_capacity(icu_str)
 
-    # --- Weight Handling (Convert grams to kg if necessary) ---
     weight_str = _extract_string("Product Net Weight")
-    weight_kg = _float(weight_str)
+    weight_kg = _to_float(weight_str)
     if weight_kg and "g" in weight_str.lower() and "kg" not in weight_str.lower():
-        weight_kg = weight_kg / 1000.0
+        weight_kg /= 1000.0
 
     return CanonicalMCB(
-        sku=sku,
-        brand="ABB",
-        display_name=display_name,
-        poles=_int(_extract_string("Number of Poles")),
-        protected_poles=_int(_extract_string("Number of Protected Poles")),
-        rated_current_a=_float(_extract_string("Rated Current (In)")),
-        tripping_characteristic=_extract_string("Tripping Characteristic"),
-        voltage_to_service_short_circuit_breaking_capacity_ka=ics_dict,
-        voltage_to_ultimate_short_circuit_breaking_capacity_ka=icu_dict,
-        height_mm=_float(_extract_string("Product Net Height")),
-        width_mm=_float(_extract_string("Product Net Width")),
-        depth_mm=_float(_extract_string("Product Net Depth")),
-        datasheet_url=datasheet_url,
-        image_urls=image_urls if image_urls else None,
-        rated_frequency_hz=_parse_frequency(_extract_string("Rated Frequency (f)")),
-        weight_kg=weight_kg if weight_kg else None
+        m_sku=sku,
+        m_brand="ABB",
+        m_name=display_name,
+        m_poles=int(_to_float(_extract_string("Number of Poles"))),
+        m_protected_poles=int(_to_float(_extract_string("Number of Protected Poles"))),
+        m_i_n=_to_float(_extract_string("Rated Current (In)")),
+        m_trip_class=_extract_string("Tripping Characteristic"),
+        m_i_sc=ics_dict,
+        m_i_cu=icu_dict,
+        m_height_mm=_to_float(_extract_string("Product Net Height")),
+        m_width_mm=_to_float(_extract_string("Product Net Width")),
+        m_depth_mm=_to_float(_extract_string("Product Net Depth")),
+        datasheet=datasheet_url,
+        img=image_urls if image_urls else None,
+        m_f_n=_parse_frequency(_extract_string("Rated Frequency (f)")),
+        m_weight_kg=weight_kg if weight_kg else None
     )
 
+
 def extract_voltage_range(raw_list: List[str]) -> Dict[str, Optional[str]]:
-    """Helper to convert list strings into min/max dictionary."""
     if not raw_list:
         return {"minimum": None, "maximum": None}
-    
-    # Simple regex to grab numbers from the first entry
     vals = re.findall(r'\d+', raw_list[0])
     return {
         "minimum": f"{vals[0]}V AC" if len(vals) > 0 else None,
         "maximum": f"{vals[1]}V AC" if len(vals) > 1 else None
     }
 
+
 def _parse_voltage_string(v_str: str) -> Dict[str, Any]:
-    """
-    Parses strings like '220\u2026250 V AC' or '220 ... 250 V AC'
-    into {'min': 220, 'max': 250, 'unit': 'V'}
-    """
-    # Regex: Capture number1, separator(s), number2, and then the unit
     pattern = r'(\d+)\s*[…\.]+\s*(\d+)\s*([a-zA-Z]+)'
     match = re.search(pattern, v_str)
     if match:
@@ -410,25 +316,17 @@ def _parse_voltage_string(v_str: str) -> Dict[str, Any]:
         }
     return {"minimum": None, "maximum": None, "unit": None}
 
-def get_datasheet_url(certs: Dict[str, Any]) -> Optional[str]:
-    """Helper to extract the first available technical datasheet URL."""
-    ds_list = certs.get("Data Sheet, Technical Information", [])
-    if isinstance(ds_list, list) and ds_list:
-        return f"https://search.abb.com/library/Download.aspx?DocumentID={ds_list[0]}&LanguageCode=en"
-    return None
 
 def extract_operational_voltage(tech_info: Dict[str, Any]) -> Dict[str, Optional[str]]:
-    """Parses Rated Voltage to the new operational_voltage structure."""
     raw_voltages = tech_info.get("Rated Voltage (U<sub>r</sub>)", [])
     if not raw_voltages:
         return {"minimum": None, "maximum": None}
-    
-    # Use the regex parser you already have to get numbers
     vals = re.findall(r'\d+', str(raw_voltages[0]))
     return {
         "minimum": f"{vals[0]}V" if len(vals) > 0 else None,
-        "maximum": f"{vals[1]}V" if len(vals) > 1 else vals[0] + "V" # Handle single voltage
+        "maximum": f"{vals[1]}V" if len(vals) > 1 else vals[0] + "V"
     }
+
 
 def map_abb_to_canonical_motor_operator(raw_data: Dict[str, Any]) -> CanonicalMotorOperator:
     gen_info = raw_data.get("General Information", {})
@@ -437,74 +335,56 @@ def map_abb_to_canonical_motor_operator(raw_data: Dict[str, Any]) -> CanonicalMo
     certs = raw_data.get("Certificates and Declarations", {})
     
     return CanonicalMotorOperator(
-        sku=gen_info.get("Global ID"),
-        brand="ABB",
-        display_name=gen_info.get("Display Name"),
-        description=gen_info.get("Meta Description"),
+        m_sku=gen_info.get("Global ID"),
+        m_brand="ABB",
+        m_name=gen_info.get("Display Name"),
+        m_description=gen_info.get("Meta Description"),
         ean=raw_data.get("Classification", {}).get("Level 1 EAN"),
-        # New Fields
-        operational_voltage=extract_operational_voltage(tech_info),
-        voltage_protection_level=tech_info.get("Impulse Withstand Voltage (U<sub>imp</sub>)"),
-        datasheet_url=get_datasheet_url(certs),
-        # Existing Fields
-        voltage_range_ac=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "AC" in v.upper()],
-        voltage_range_dc=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "DC" in v.upper()],
-        current_type=tech_info.get("Current Type"),
-        suitable_for_breakers=[add_info.get("Suitable For", "")],
-        product_class=add_info.get("Suitable for Product Class"),
-        configuration_type=tech_info.get("Configuration Type"),
-        is_auto_reset="Auto-Reset" in gen_info.get("Display Name", ""),
-        standards=tech_info.get("Standards", []),
-        image_urls=gen_info.get("Images", [])
+        m_u_n=extract_operational_voltage(tech_info),
+        m_u_prot=tech_info.get("Impulse Withstand Voltage (U<sub>imp</sub>)"),
+        datasheet=_build_datasheet_url(certs.get("Data Sheet, Technical Information")),
+        m_u_ac_range=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "AC" in v.upper()],
+        m_u_dc_range=[_parse_voltage_string(v) for v in tech_info.get("Rated Voltage (U<sub>r</sub>)", []) if "DC" in v.upper()],
+        m_current_type=tech_info.get("Current Type"),
+        m_suitable_for=[add_info.get("Suitable For", "")],
+        m_product_class=add_info.get("Suitable for Product Class"),
+        m_config_type=tech_info.get("Configuration Type"),
+        m_is_auto_reset="Auto-Reset" in gen_info.get("Display Name", ""),
+        m_standards=tech_info.get("Standards", []),
+        img=_normalize_images(gen_info.get("Images"))
     )
 
+
 def map_abb_to_canonical_isolator(raw_data: Dict[str, Any]) -> CanonicalIsolator:
-    """
-    Maps ABB Isolator raw JSON to a CanonicalIsolator object, 
-    correctly targeting Electrical and Popular Downloads metadata.
-    """
     gen_info = raw_data.get("General Information", {})
     dims = raw_data.get("Dimensions", {})
     elec = raw_data.get("Electrical", {})
     downloads = raw_data.get("Popular Downloads", {})
     
-    # 1. Extract basic identity
     short_name = gen_info.get("Short Name", "")
     poles_match = re.search(r'(\d+)P', short_name)
     current_match = re.search(r'(\d+)A', short_name)
     
-    # 2. Extract and parse operational voltage
-    # Looks for strings containing "Minimum" or "Maximum" in the Electrical section
     ops_volt = elec.get("Operational Voltage", [])
     operational_voltage = {
         "minimum": next((v.replace("Minimum ", "") for v in ops_volt if "Minimum" in v), None),
         "maximum": next((v.replace("Maximum ", "") for v in ops_volt if "Maximum" in v), None)
     }
     
-    # 3. Extract datasheet from Popular Downloads
-    ds_id = downloads.get("Data Sheet, Technical Information")
-    datasheet_url = f"https://search.abb.com/library/Download.aspx?DocumentID={ds_id}&LanguageCode=en" if ds_id else None
-
-    # 4. Helper for dimensions
-    def parse_dim(key):
-        val = dims.get(key, "0")
-        match = re.search(r'\d+(\.\d+)?', str(val))
-        return float(match.group()) if match else None
-
     return CanonicalIsolator(
-        sku=gen_info.get("Global ID"),
-        brand="ABB",
-        display_name=gen_info.get("Display Name"),
-        rated_current_a=float(current_match.group(1)) if current_match else None,
-        number_of_poles=int(poles_match.group(1)) if poles_match else None,
-        operational_voltage=operational_voltage,
-        voltage_protection_level=elec.get("Voltage Protection Level ( Up)"),
-        datasheet_url=datasheet_url,
-        width_mm=parse_dim("Product Net Width"),
-        height_mm=parse_dim("Product Net Height"),
-        depth_mm=parse_dim("Product Net Depth / Length"),
-        modular_spacings=int(dims.get("Width in Number of Modular Spacings", 0)),
-        image_urls=gen_info.get("Images", [])
+        m_sku=gen_info.get("Global ID"),
+        m_brand="ABB",
+        m_name=gen_info.get("Display Name"),
+        m_i_n=float(current_match.group(1)) if current_match else None,
+        m_poles=int(poles_match.group(1)) if poles_match else None,
+        m_u_n=operational_voltage,
+        m_u_prot=elec.get("Voltage Protection Level ( Up)"),
+        datasheet=_build_datasheet_url(downloads.get("Data Sheet, Technical Information")),
+        m_width_mm=_to_float(dims.get("Product Net Width")) or None,
+        m_height_mm=_to_float(dims.get("Product Net Height")) or None,
+        m_depth_mm=_to_float(dims.get("Product Net Depth / Length")) or None,
+        m_modular_spacings=int(_to_float(dims.get("Width in Number of Modular Spacings", 0))),
+        img=_normalize_images(gen_info.get("Images"))
     )
 
 
@@ -512,32 +392,22 @@ def map_abb_to_canonical_spreader(raw_data: Dict[str, Any]) -> CanonicalSpreader
     gen_info = raw_data.get("General Information", {})
     add_info = raw_data.get("Additional Information", {})
     tech = raw_data.get("Technical", {})
-    order = raw_data.get("Ordering", {})
-    dims = raw_data.get("Dimensions", {})  # Added Dimensions
+    dims = raw_data.get("Dimensions", {})
     certs = raw_data.get("Certificates and Declarations", {})
     
-    # 1. Look for 'Product Net Weight' in Dimensions first
-    # 2. Fallback to 'Package Level 1 Gross Weight' if not found
-    weight_str = dims.get("Product Net Weight") or dims.get("Package Level 1 Gross Weight", "0")
-    
-    # Extract numeric value
-    weight_match = re.search(r'[\d\.]+', str(weight_str))
-    weight_val = float(weight_match.group()) if weight_match else None
-
-    # Handle suitable for (ensure it's a list)
+    weight_str = dims.get("Product Net Weight") or dims.get("Package Level 1 Gross Weight")
     suitable = add_info.get("Suitable For", [])
-    suitable_list = [suitable] if isinstance(suitable, str) else suitable
 
     return CanonicalSpreader(
-        sku=gen_info.get("Global ID"),
-        brand="ABB",
-        display_name=gen_info.get("Display Name"),
-        description=gen_info.get("Meta Description"),
-        datasheet_url=get_datasheet_url(certs),
-        weight_kg=weight_val,
-        configuration_type=tech.get("Configuration Type"),
-        number_of_poles=tech.get("Number of Poles"),
-        order_multiple=tech.get("Order Multiple"),
-        suitable_for=suitable_list,
-        image_urls=gen_info.get("Images", [])
+        m_sku=gen_info.get("Global ID"),
+        m_brand="ABB",
+        m_name=gen_info.get("Display Name"),
+        m_description=gen_info.get("Meta Description"),
+        datasheet=_build_datasheet_url(certs.get("Data Sheet, Technical Information")),
+        m_weight_kg=_to_float(weight_str) or None,
+        m_config_type=tech.get("Configuration Type"),
+        m_poles=tech.get("Number of Poles"),
+        m_order_multiple=tech.get("Order Multiple"),
+        m_suitable_for=[suitable] if isinstance(suitable, str) else suitable,
+        img=_normalize_images(gen_info.get("Images"))
     )

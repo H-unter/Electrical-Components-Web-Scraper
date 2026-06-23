@@ -23,7 +23,7 @@ _MAPPER_REGISTRY = {
    ("rittal", "enclosure"): map_rittal_to_canonical_enclosure,
 }
 
-def map_to(brand: str, component_type: str, raw_data: dict):
+def map_to(brand: str, component_type: str, raw_data: dict | None) -> object | None:
     """
     Unified entry point for all mappings.
     """
